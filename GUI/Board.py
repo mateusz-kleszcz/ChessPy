@@ -21,12 +21,11 @@ class Board:
     def draw_board(self, screen):
         for i, row in enumerate(self.board):
             is_field_black = i % 2
-            for j, piece_name in enumerate(row):
+            for j, piece in enumerate(row):
                 square = pygame.Surface((FIELD_WIDTH, FIELD_WIDTH))
                 background = pygame.Rect(0, 0, FIELD_WIDTH, FIELD_WIDTH)
                 pygame.draw.rect(square, get_color(is_field_black), background)
-                if piece_name != 'XX':
-                    piece = Piece(piece_name)
+                if piece is not None:
                     self.pieces.append(piece)
                     piece_image = pygame.transform.scale(piece.image, (FIELD_WIDTH, FIELD_WIDTH))
                     square.blit(piece_image, (0, 0))
