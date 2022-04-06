@@ -2,7 +2,7 @@ import pygame as p
 
 from .Move import Move
 from GUI.Screen import Screen
-from ChessPy.Classes.Pieces import *
+from Classes.Pieces import *
 
 WIDTH = 1280
 HEIGHT = 720
