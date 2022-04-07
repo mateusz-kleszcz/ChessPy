@@ -12,9 +12,18 @@ class Move:
         self.endCol = endSq[1]
         self.movedPiece = board[self.startRow][self.startCol]
         self.capturedPiece = board[self.endRow][self.endCol]
+        self.id = 1000*self.startRow + 100*self.startCol + 10*self.endRow + self.endCol
+
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.id == other.id
+        return False
 
     def get_file_rank(self, row, column):
         return self.colsToFiles[column] + self.rowsToRanks[row]
 
     def get_notation(self):
         return self.get_file_rank(self.startRow, self.startCol) + " -> " + self.get_file_rank(self.endRow, self.endCol)
+
+    def __str__(self):
+        return self.get_notation()
