@@ -114,7 +114,6 @@ class ChessEngine:
         row = location[1] // FIELD_WIDTH
 
         if col >= col_nr or row >= row_nr or self.active_square == (row, col):
-            print("+")
             self.reset_clicks()
         elif len(self.clicked_squares) == 0:
             piece = self.board[row][col]

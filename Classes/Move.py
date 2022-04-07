@@ -5,14 +5,14 @@ class Move:
     filesToCols = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
 
-    def __init__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board, special_move_id=0):
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
         self.endCol = endSq[1]
+        self.id = 1000 * self.startRow + 100 * self.startCol + 10 * self.endRow + self.endCol + special_move_id
         self.movedPiece = board[self.startRow][self.startCol]
         self.capturedPiece = board[self.endRow][self.endCol]
-        self.id = 1000*self.startRow + 100*self.startCol + 10*self.endRow + self.endCol
 
     def __eq__(self, other):
         if isinstance(other, Move):
