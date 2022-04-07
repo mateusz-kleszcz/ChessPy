@@ -17,7 +17,7 @@ while True:
             engine.handle_click(location)
         elif event.type == p.KEYDOWN:
             if event.key == p.K_BACKSPACE: # undo move
-                engine.undo_move()
+                engine.undo_move(validated_move=True)
 
     # draw chessboard
     engine.draw_chessboard()
