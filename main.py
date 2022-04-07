@@ -1,7 +1,7 @@
 import pygame as p
 import sys
 
-from ChessPy.Classes.ChessEngine import ChessEngine
+from Classes.ChessEngine import ChessEngine
 
 SIZE = 8
 
@@ -21,6 +21,5 @@ while True:
 
     # draw chessboard
     engine.draw_chessboard()
-
 
 

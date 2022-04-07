@@ -2,7 +2,7 @@ import pygame as p
 
 from .Move import Move
 from GUI.Screen import Screen
-from ChessPy.Classes.Pieces import *
+from Classes.Pieces import *
 
 WIDTH = 1280
 HEIGHT = 720
@@ -29,6 +29,7 @@ class ChessEngine:
         self.game_log = []
         self.possible_move_log = []
         self.all_valid_moves = self.get_all_valid_moves()
+        self.active_piece_possible_moves = []
 
     def __get_active_color(self):
         if self.white_to_move:
@@ -87,7 +88,6 @@ class ChessEngine:
         self.white_to_move = not self.white_to_move
         if validated_move:
             move.movedPiece.is_moved = True
-            print(move.get_notation())
             self.game_log.append(move)
         else:
             self.possible_move_log.append(move)
@@ -106,6 +106,7 @@ class ChessEngine:
     def reset_clicks(self):
         self.active_square = ()
         self.clicked_squares = []
+        self.active_piece_possible_moves = []
 
     def handle_click(self, location):
         row_nr = len(self.board)
@@ -120,21 +121,21 @@ class ChessEngine:
             if piece is not None and piece.color == self.__get_active_color():
                 self.active_square = (row, col)
                 self.clicked_squares.append(self.active_square)
+                # show possible moves
+                self.active_piece_possible_moves = piece.get_possible_moves(self.board, row, col)
         else:
             self.active_square = (row, col)
             self.clicked_squares.append(self.active_square)
 
-        print(f'active square -> {self.active_square}; to move: {self.__get_active_color()}')
+        # print(f'active square -> {self.active_square}; to move: {self.__get_active_color()}')
         if len(self.clicked_squares) == 2:
-            print(self.all_valid_moves)
             move = Move(self.clicked_squares[0], self.clicked_squares[1], self.board)
             self.reset_clicks()
             if move in self.all_valid_moves:
                 self.make_move(move, validated_move=True)
                 self.all_valid_moves = self.get_all_valid_moves()
-            else:
-                print(f'Invalid move: {move}')
+            # else:
+            #     print(f'Invalid move: {move}')
 
     def draw_chessboard(self):
-        self.screen.draw_board()
-
+        self.screen.draw_board(self.active_square, self.active_piece_possible_moves)
