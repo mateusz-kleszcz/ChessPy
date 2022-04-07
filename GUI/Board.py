@@ -38,7 +38,8 @@ class Board:
                 row_fields.append(square)
                 # mark fields that are possible moves
                 for move in possible_moves:
-                    if move.endRow == j and move.endCol == i:
+                    # if move.endRow == j and move.endCol == i:
+                    if move.endRow == i and move.endCol == j:
                         square.mark_field_as_possible_move()
                 screen.blit(square.get_surface(), square.get_screen_position())
             self.fields.append(row_fields)
