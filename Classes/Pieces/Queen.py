@@ -14,7 +14,7 @@ class Queen(Piece):
         else:
             is_white = False
 
-        bishup = Bishop(is_white)
+        bishop = Bishop(is_white)
         rook = Rook(is_white)
         return rook.get_possible_moves(chess_board, row, col) + \
-               bishup.get_possible_moves(chess_board, row, col)
+               bishop.get_possible_moves(chess_board, row, col)

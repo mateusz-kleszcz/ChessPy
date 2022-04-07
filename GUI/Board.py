@@ -3,6 +3,7 @@ import pygame
 from GUI.Field import Field
 
 BOARD_SIZE = 8
+ACTIVE_BACKGROUND = (117, 199, 232)
 
 
 def get_color(is_field_black):
@@ -18,27 +19,28 @@ class Board:
         self.fields = []
 
     # draw board first time on first render
-    def draw_board(self, screen):
+    def draw_board(self, screen, active_square, possible_moves):
+        # create fields
         for i, row in enumerate(self.board):
             is_field_black = i % 2
             row_fields = []
             for j, piece in enumerate(row):
-                # create field
                 color = get_color(is_field_black)
+                # if square is active change background color
+                if active_square != ():
+                    x, y = active_square
+                    if x == i and y == j:
+                        print(i, j)
+                        color = ACTIVE_BACKGROUND
                 square = Field(color, j, i, piece)
-                screen.blit(square.get_surface(), square.get_screen_position())
                 is_field_black = not is_field_black
                 # add field to list
                 row_fields.append(square)
+                # mark fields that are possible moves
+                for move in possible_moves:
+                    if move.endRow == j and move.endCol == i:
+                        square.mark_field_as_possible_move()
+                screen.blit(square.get_surface(), square.get_screen_position())
             self.fields.append(row_fields)
-        self.mark_allowed_field(3, 3, screen)
+        # add fields to screen
         pygame.display.flip()
-
-    # mark field as allowed, function takes two arguments, i - row, j - column that should be allowed
-    def mark_allowed_field(self, i, j, screen):
-        if not (0 <= i < BOARD_SIZE and 0 <= j < BOARD_SIZE):
-            return
-        field = self.fields[i][j]
-        color = (100, 100, 100)
-        pygame.draw.circle(screen, color, (20, 20), 100)
-        pygame.display.update()

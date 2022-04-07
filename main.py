@@ -23,4 +23,3 @@ while True:
     engine.draw_chessboard()
 
 
-

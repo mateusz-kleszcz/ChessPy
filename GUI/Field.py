@@ -25,3 +25,14 @@ class Field:
 
     def draw_inside_field(self, obj, pos):
         self.square.blit(obj, pos)
+
+    def change_background_color(self, color):
+        pygame.draw.rect(self.square, color, self.background)
+
+    def mark_field_as_possible_move(self):
+        x = 0.5 * FIELD_WIDTH
+        y = 0.5 * FIELD_WIDTH
+        pos = (x, y)
+        radius = 10
+        color = (100, 100, 100)
+        pygame.draw.circle(self.square, color, pos, radius)
