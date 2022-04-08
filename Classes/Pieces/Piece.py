@@ -1,24 +1,5 @@
 import pygame as p
 import os
-from ..Move import Move
-
-
-def __get_possible_moves_for_piece_with_limited_dir(chess_board, row, col, moves_dir, color):
-    possible_moves = []
-    row_nr = len(chess_board)
-    col_nr = len(chess_board[0])
-
-    for move_dir in moves_dir:
-        row_dir = move_dir[0]
-        col_dir = move_dir[1]
-        if 0 <= row + row_dir < row_nr and 0 <= col + col_dir < col_nr:
-            piece = chess_board[row + row_dir][col + col_dir]
-            if piece is None or piece.color != color:
-                start_sq = (row, col)
-                end_sq = (row + row_dir, col + col_dir)
-                possible_moves.append(Move(start_sq, end_sq, chess_board))
-
-    return possible_moves
 
 
 class Piece:

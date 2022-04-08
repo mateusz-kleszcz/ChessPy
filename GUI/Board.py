@@ -14,12 +14,13 @@ def get_color(is_field_black):
 
 
 class Board:
-    def __init__(self, board):
+    def __init__(self, board, field_size):
         self.board = board
+        self.field_size = field_size
         self.fields = []
 
     # draw board first time on first render
-    def draw_board(self, screen, active_square, possible_moves):
+    def draw_board(self, screen, active_square, valid_moves):
         # create fields
         for i, row in enumerate(self.board):
             is_field_black = i % 2
@@ -30,15 +31,13 @@ class Board:
                 if active_square != ():
                     x, y = active_square
                     if x == i and y == j:
-                        print(i, j)
                         color = ACTIVE_BACKGROUND
-                square = Field(color, j, i, piece)
+                square = Field(self.field_size, color, j, i, piece)
                 is_field_black = not is_field_black
                 # add field to list
                 row_fields.append(square)
                 # mark fields that are possible moves
-                for move in possible_moves:
-                    # if move.endRow == j and move.endCol == i:
+                for move in valid_moves:
                     if move.endRow == i and move.endCol == j:
                         square.mark_field_as_possible_move()
                 screen.blit(square.get_surface(), square.get_screen_position())
