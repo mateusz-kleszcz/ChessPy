@@ -1,12 +1,12 @@
-from .Piece import Piece
-from .Bishop import Bishop
-from .Rook import Rook
+from Pieces import Piece
+from Pieces.Bishop import Bishop
+from Pieces.Rook import Rook
 
 
 class Queen(Piece):
 
-    def __init__(self, is_white):
-        super().__init__(is_white, "Q")
+    def __init__(self, is_white, is_moved=False):
+        super().__init__(is_white, "Q", is_moved)
 
     def get_possible_moves(self, chess_board, row, col):
         if self.color == "W":

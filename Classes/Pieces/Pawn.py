@@ -1,11 +1,13 @@
-from .Piece import Piece
-from ..Move import Move
+from Pieces import Piece
+from Moves.Move import Move
+from Moves.EnPassantMove import EnPassantMove
+from Moves.PawnPromotion import PawnPromotion
 
 
 class Pawn(Piece):
 
-    def __init__(self, is_white):
-        super().__init__(is_white, "P")
+    def __init__(self, is_white, is_moved=False):
+        super().__init__(is_white, "P", is_moved)
         self.en_passant = False
 
     def get_possible_moves(self, chess_board, row, col):
@@ -21,12 +23,15 @@ class Pawn(Piece):
         if 0 <= row + row_dir < row_nr and 0 <= col < col_nr and chess_board[row + row_dir][col] is None:
             start_sq = (row, col)
             end_sq = (row + row_dir, col)
-            possible_moves.append(Move(start_sq, end_sq, chess_board))
-            if not self.is_moved and 0 <= row + 2 * row_dir < row_nr and 0 <= col < col_nr and \
-                    chess_board[row + 2 * row_dir][col] is None:
-                start_sq = (row, col)
-                end_sq = (row + 2 * row_dir, col)
-                possible_moves.append(Move(start_sq, end_sq, chess_board))
+            if end_sq[0] == 0 or end_sq[0] == row_nr - 1:
+                possible_moves.append(PawnPromotion(chess_board, start_sq, end_sq))
+            else:
+                possible_moves.append(Move(chess_board, start_sq, end_sq))
+                if not self.is_moved and 0 <= row + 2 * row_dir < row_nr and 0 <= col < col_nr and \
+                        chess_board[row + 2 * row_dir][col] is None:
+                    start_sq = (row, col)
+                    end_sq = (row + 2 * row_dir, col)
+                    possible_moves.append(Move(chess_board, start_sq, end_sq))
 
         # capturing piece
         for col_dir in (-1, 1):
@@ -37,7 +42,10 @@ class Pawn(Piece):
                 if self.color != captured_piece.color:
                     start_sq = (row, col)
                     end_sq = (row + row_dir, col + col_dir)
-                    possible_moves.append(Move(start_sq, end_sq, chess_board))
+                    if row + row_dir == 0 or row + row_dir == row_nr - 1:
+                        possible_moves.append(PawnPromotion(chess_board, start_sq, end_sq))
+                    else:
+                        possible_moves.append(Move(chess_board, start_sq, end_sq))
 
         # en passant
         for col_dir in (-1, 1):
@@ -49,6 +57,7 @@ class Pawn(Piece):
                 if self.color != captured_pawn.color and captured_pawn.en_passant:
                     start_sq = (row, col)
                     end_sq = (row + row_dir, col + col_dir)
-                    possible_moves.append(Move(start_sq, end_sq, chess_board))
+                    captured_pawn_sq = (row, col + col_dir)
+                    possible_moves.append(EnPassantMove(chess_board, start_sq, end_sq, captured_pawn_sq))
 
         return possible_moves

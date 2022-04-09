@@ -1,11 +1,11 @@
-from .Piece import Piece
-from ..Move import Move
+from Pieces import Piece
+from Moves.Move import Move
 
 
 class Bishop(Piece):
 
-    def __init__(self, is_white):
-        super().__init__(is_white, "B")
+    def __init__(self, is_white, is_moved=False):
+        super().__init__(is_white, "B", is_moved)
 
     def get_possible_moves(self, chess_board, row, col):
         possible_moves = []
@@ -20,9 +20,9 @@ class Bishop(Piece):
                     end_sq = (row + row_dir*dir_len, col + col_dir*dir_len)
                     if piece is None:
                         dir_len += 1
-                        possible_moves.append(Move(start_sq, end_sq, chess_board))
+                        possible_moves.append(Move(chess_board, start_sq, end_sq))
                         continue
                     elif piece.color != self.color:
-                        possible_moves.append(Move(start_sq, end_sq, chess_board))
+                        possible_moves.append(Move(chess_board, start_sq, end_sq))
                     break
         return possible_moves

@@ -10,17 +10,17 @@ def main():
     FPS = 60
     engine = ChessEngine(SCREEN_WIDTH, SCREEN_HEIGHT, FIELD_WIDTH)
     clock = p.time.Clock()
-
+    game_ended = False
     while True:
         clock.tick(FPS)
         # handle events
         for event in p.event.get():
-            if event.type == p.QUIT:
+            if event.type == p.QUIT or game_ended:
                 sys.exit(0)
             elif event.type == p.MOUSEBUTTONDOWN:
                 # make move
                 location = p.mouse.get_pos()
-                engine.handle_click(location)
+                game_ended = engine.handle_click(location)
             elif event.type == p.KEYDOWN and event.key == p.K_BACKSPACE:
                 # undo move
                 engine.undo_move(validated_move=True)

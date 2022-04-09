@@ -1,5 +1,5 @@
-from .Piece import Piece
-from ..Move import Move
+from Pieces import Piece
+from Moves.Move import Move
 
 
 class PieceWithLimitedMoveDir(Piece):
@@ -21,6 +21,6 @@ class PieceWithLimitedMoveDir(Piece):
                 if piece is None or piece.color != self.color:
                     start_sq = (row, col)
                     end_sq = (row + row_dir, col + col_dir)
-                    possible_moves.append(Move(start_sq, end_sq, chess_board))
+                    possible_moves.append(Move(chess_board, start_sq, end_sq))
 
         return possible_moves
