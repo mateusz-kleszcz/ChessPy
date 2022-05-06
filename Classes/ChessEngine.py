@@ -1,8 +1,10 @@
 import pygame as p
-from GUI.Screen import Screen
 from Pieces import *
 from Moves import *
+from GUI import *
 import random
+
+from Screen import Screen
 
 ROW_NR = 8
 COL_NR = 8
@@ -36,6 +38,9 @@ class ChessEngine:
         self.update_all_valid_moves()
         self.active_piece_valid_moves = []
         self.board_val = self.calculate_board_val()
+        self.is_game_started = False
+        self.time_white = 10 * 60 * 1000
+        self.time_black = 10 * 60 * 1000
 
     def calculate_board_val(self):
         board_val = 0
@@ -197,17 +202,28 @@ class ChessEngine:
         self.active_piece_valid_moves = []
 
     def handle_click(self, location):
-        row_nr = len(self.board)
-        col_nr = len(self.board[0])
-        col, row = self.screen.get_square_position(location)
+        # check is controls clicked
+        self.screen.controls.handle_button_click(location, self)
 
-        if col >= col_nr or row >= row_nr or self.active_square == (row, col):
-            self.reset_clicks()
-        elif len(self.clicked_squares) == 0:
-            piece = self.board[row][col]
-            if piece is not None and piece.color == self.__get_active_color():
+        if self.is_game_started:
+            row_nr = len(self.board)
+            col_nr = len(self.board[0])
+            col, row = self.screen.get_square_position(location)
+
+            if col >= col_nr or row >= row_nr or self.active_square == (row, col):
+                self.reset_clicks()
+            elif len(self.clicked_squares) == 0:
+                piece = self.board[row][col]
+                if piece is not None and piece.color == self.__get_active_color():
+                    self.active_square = (row, col)
+                    self.clicked_squares.append(self.active_square)
+                    # show possible moves
+                    self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
+                                                     self.active_square == (pos[0], pos[1]) and move is not None]
+            else:
                 self.active_square = (row, col)
                 self.clicked_squares.append(self.active_square)
+
                 # show possible moves
                 self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
                                                  self.active_square == (pos[0], pos[1]) and move is not None]
@@ -267,4 +283,10 @@ class ChessEngine:
             return best_val
 
     def draw_chessboard(self):
-        self.screen.draw_board(self.active_square, self.active_piece_valid_moves)
+        self.screen.draw_board(self.active_square, self.active_piece_valid_moves, self)
+
+    def start_game(self):
+        self.is_game_started = True
+
+    def end_game(self):
+        self.is_game_started = False
