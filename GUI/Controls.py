@@ -1,5 +1,8 @@
 from GUI.Button import Button
 
+def change_game_mode(engine, value):
+    print(value)
+
 
 def change_time(engine, value):
     engine.time_white = value * 60 * 1000
@@ -13,12 +16,13 @@ def start_game(engine, value):
 class Controls:
     def __init__(self, screen):
         self.buttons = [
-            Button(200, 40, 1000, 200, "3 minuty", 3, change_time),
+            Button(200, 40, 800, 200, "Hot-seat", "H", change_game_mode),
+            Button(200, 40, 1000, 200, "Komputer", "K", change_game_mode),
+            Button(200, 40, 800, 300, "3 minuty", 3, change_time),
             Button(200, 40, 1000, 300, "10 minut", 10, change_time),
-            Button(200, 40, 1000, 400, "Graj", None, start_game),
+            Button(200, 40, 900, 400, "Graj", None, start_game),
         ]
-        for button in self.buttons:
-            button.add_to_scene(screen)
+        self.screen = screen
 
     def handle_button_click(self, location, engine):
         x, y = location
@@ -28,4 +32,8 @@ class Controls:
 
     def hide_buttons(self):
         for button in self.buttons:
-            button.hide_button()
+            button.hide_button(self.screen)
+
+    def draw_buttons(self):
+        for button in self.buttons:
+            button.add_to_scene(self.screen)

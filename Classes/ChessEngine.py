@@ -3,7 +3,7 @@ import pygame as p
 from Classes.Moves.Castle import Castle
 from Classes.Moves.EnPassantMove import EnPassantMove
 from Classes.Moves.PawnPromotion import PawnPromotion
-from Pieces import *
+from Classes.Pieces import *
 from GUI.Screen import Screen
 
 

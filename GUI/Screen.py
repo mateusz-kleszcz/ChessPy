@@ -17,7 +17,7 @@ class Screen:
 
     def draw_board(self, active_square, possible_moves, engine):
         if not engine.is_game_started:
-            self.controls = Controls(self.screen)
+            self.controls.draw_buttons()
         else:
             self.controls.hide_buttons()
             timer_white = Timer(self.screen, engine.time_white, 200)

@@ -2,25 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="300db9e4-ccdc-401e-8110-c96918e88334" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/GUI/Button.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GUI/Controls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GUI/Timer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/chessPy.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chessPy.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Classes/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/ChessEngine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Moves/Castle.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Moves/Castle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Moves/EnPassantMove.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Moves/EnPassantMove.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Moves/PawnPromotion.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Moves/PawnPromotion.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Moves/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Moves/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/Bishop.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/Bishop.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/King.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/King.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/Knight.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/Knight.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/Pawn.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/Pawn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/PieceWithLimitedMoveDir.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/PieceWithLimitedMoveDir.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/Queen.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/Queen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Classes/Pieces/Rook.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/Pieces/Rook.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUI/Button.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI/Button.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUI/Controls.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI/Controls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GUI/Screen.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI/Screen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,6 +112,7 @@
       <workItem from="1649280353393" duration="630000" />
       <workItem from="1650555658114" duration="14025000" />
       <workItem from="1651786010819" duration="4000" />
+      <workItem from="1651822819482" duration="2500000" />
     </task>
     <servers />
   </component>
@@ -146,6 +133,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/chessPy$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1649019628592" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/chessPy$main.coverage" NAME="main Coverage Results" MODIFIED="1650628612689" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/chessPy$main.coverage" NAME="main Coverage Results" MODIFIED="1651826595003" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

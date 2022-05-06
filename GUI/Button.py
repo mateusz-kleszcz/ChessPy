@@ -22,5 +22,6 @@ class Button:
     def handle_click(self, engine):
         self.on_click(engine, self.value)
 
-    def hide_button(self):
+    def hide_button(self, screen):
         self.button_box.fill((0, 0, 0))
+        screen.blit(self.button_box, (self.x, self.y))
