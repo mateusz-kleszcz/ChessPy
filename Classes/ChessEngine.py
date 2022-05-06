@@ -1,10 +1,8 @@
 import pygame as p
 
-from Classes.Moves.Castle import Castle
-from Classes.Moves.EnPassantMove import EnPassantMove
-from Classes.Moves.PawnPromotion import PawnPromotion
-from Classes.Pieces import *
 from GUI.Screen import Screen
+from Pieces import *
+from Moves import *
 
 
 def init_all_valid_moves():
