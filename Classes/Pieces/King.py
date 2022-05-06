@@ -7,7 +7,15 @@ class King(PieceWithLimitedMoveDir):
     moves_dir = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (-1, 0)]
 
     def __init__(self, is_white):
-        super().__init__(is_white, "K")
+        pos_vals = ((-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
+                    (-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
+                    (-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
+                    (-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
+                    (-2.0, -3.0, -3.0, -4.0, -4.0, -4.0, -4.0, -2.0),
+                    (-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0),
+                    (2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0),
+                    (2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0))
+        super().__init__(is_white, "K", val=900, pos_vals=pos_vals)
 
     def get_possible_moves(self, chess_board, row, col):
         all_possible_moves = super().get_possible_moves(chess_board, row, col)

@@ -5,8 +5,8 @@ from Moves.Move import Move
 class PieceWithLimitedMoveDir(Piece):
     moves_dir = []
 
-    def __init__(self, is_white, name, is_moved=False):
-        super().__init__(is_white, name, is_moved)
+    def __init__(self, is_white, name, is_moved=False, val=0, pos_vals=None):
+        super().__init__(is_white, name, is_moved=is_moved, val=val, pos_vals=pos_vals)
 
     def get_possible_moves(self, chess_board, row, col):
         possible_moves = []

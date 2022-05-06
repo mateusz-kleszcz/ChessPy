@@ -2,17 +2,18 @@ import pygame as p
 from GUI.Screen import Screen
 from Pieces import *
 from Moves import *
+import random
+
+ROW_NR = 8
+COL_NR = 8
 
 
 def init_all_valid_moves():
-    return {(sr, sc, er, ec): None for sr in range(ChessEngine.ROW_NR) for sc in range(ChessEngine.COL_NR)
-            for er in range(ChessEngine.ROW_NR) for ec in range(ChessEngine.COL_NR)}
+    return {(sr, sc, er, ec): None for sr in range(ROW_NR) for sc in range(COL_NR)
+            for er in range(ROW_NR) for ec in range(COL_NR)}
 
 
 class ChessEngine:
-    ROW_NR = 8
-    COL_NR = 8
-
     def __init__(self, screen_width, screen_height, row_size):
         self.board = [
             [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False),
@@ -34,6 +35,17 @@ class ChessEngine:
         self.all_valid_moves = init_all_valid_moves()
         self.update_all_valid_moves()
         self.active_piece_valid_moves = []
+        self.board_val = self.calculate_board_val()
+
+    def calculate_board_val(self):
+        board_val = 0
+        for row in range(ROW_NR):
+            for col in range(COL_NR):
+                piece = self.board[row][col]
+                if piece is not None:
+                    board_val += piece.val
+                    board_val += piece.pos_vals[row][col]
+        return board_val
 
     def __reset_valid_moves(self):
         self.all_valid_moves = {k: None for k, v in self.all_valid_moves.items()}
@@ -149,6 +161,8 @@ class ChessEngine:
         if validated_move:
             move.movedPiece.is_moved = True
             self.game_log.append(move)
+            self.board_val = self.calculate_board_val()
+            self.update_all_valid_moves()
         else:
             self.possible_move_log.append(move)
         self.__update_en_passant_pawn()
@@ -206,7 +220,6 @@ class ChessEngine:
             self.reset_clicks()
             if move is not None:
                 self.make_move(move, validated_move=True)
-                self.update_all_valid_moves()
                 if len(list(set(list(self.all_valid_moves.values())))) == 1:
                     self.white_to_move = not self.white_to_move
                     all_moves_at_the_end = self.get_all_possible_moves()
@@ -218,6 +231,40 @@ class ChessEngine:
                     print("Game ended with a tie!")
                     return True
         return False
+
+    def make_engine_move(self):
+        # move = random.choice(tuple(filter(lambda move: move is not None, self.all_valid_moves.values())))
+        move = self.calculate_engine_move(max_lvl=5)
+        self.make_move(move, validated_move=True)
+
+    def calculate_engine_move(self, max_lvl, lvl=0):
+        if lvl >= max_lvl:
+            return self.calculate_board_val()
+        valid_moves = tuple(filter(lambda move: move is not None, self.all_valid_moves.values()))
+        best_move = None
+        best_val = None
+        if self.white_to_move:
+            max_ = float('-inf')
+            for move in valid_moves:
+                self.make_move(move, validated_move=False)
+                if self.calculate_engine_move(max_lvl, lvl+1) > max_:
+                    best_move = move
+                    max_ = self.calculate_engine_move(max_lvl, lvl+1)
+                self.undo_move(validated_move=False)
+            best_val = max_
+        else:
+            min_ = float('inf')
+            for move in valid_moves:
+                self.make_move(move, validated_move=False)
+                if self.calculate_engine_move(max_lvl, lvl+1) < min_:
+                    best_move = move
+                    min_ = self.calculate_engine_move(max_lvl, lvl+1)
+                self.undo_move(validated_move=False)
+            best_val = min_
+        if lvl == 0:
+            return best_move
+        else:
+            return best_val
 
     def draw_chessboard(self):
         self.screen.draw_board(self.active_square, self.active_piece_valid_moves)
