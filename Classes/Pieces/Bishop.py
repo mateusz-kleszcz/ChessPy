@@ -3,9 +3,16 @@ from Moves.Move import Move
 
 
 class Bishop(Piece):
-
     def __init__(self, is_white, is_moved=False):
-        super().__init__(is_white, "B", is_moved)
+        pos_vals = ((-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0),
+                    (-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0),
+                    (-1.0, 0.0, 0.5, 1.0, 1.0, 1.0, 0.0, -1.0),
+                    (-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0),
+                    (-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0),
+                    (-1.0, 0.0, 0.5, 1.0, 1.0, 1.0, 0.0, -1.0),
+                    (-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0),
+                    (-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0))
+        super().__init__(is_white, "B", is_moved=is_moved, val=30, pos_vals=pos_vals)
 
     def get_possible_moves(self, chess_board, row, col):
         possible_moves = []

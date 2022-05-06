@@ -6,7 +6,15 @@ from Classes.Pieces.Rook import Rook
 class Queen(Piece):
 
     def __init__(self, is_white, is_moved=False):
-        super().__init__(is_white, "Q", is_moved)
+        pos_vals = ((-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0),
+                    (-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0),
+                    (-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0),
+                    (-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5),
+                    (-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5),
+                    (-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0),
+                    (-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0),
+                    (-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0))
+        super().__init__(is_white, "Q", is_moved=is_moved, val=90, pos_vals=pos_vals)
 
     def get_possible_moves(self, chess_board, row, col):
         if self.color == "W":
