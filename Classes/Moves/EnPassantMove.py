@@ -1,4 +1,4 @@
-from Moves.Move import Move
+from Classes.Moves.Move import Move
 
 
 class EnPassantMove(Move):

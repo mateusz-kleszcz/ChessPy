@@ -1,6 +1,6 @@
-from Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
-from Pieces.Rook import Rook
-from Moves.Castle import Castle
+from Classes.Moves.Castle import Castle
+from Classes.Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
+from Classes.Pieces.Rook import Rook
 
 
 class King(PieceWithLimitedMoveDir):

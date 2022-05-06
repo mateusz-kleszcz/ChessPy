@@ -3,17 +3,24 @@ import sys
 from Classes.ChessEngine import ChessEngine
 
 
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+FIELD_WIDTH = 80
+FPS = 50
+
+
 def main():
-    SCREEN_WIDTH = 1280
-    SCREEN_HEIGHT = 720
-    FIELD_WIDTH = 80
-    FPS = 60
     engine = ChessEngine(SCREEN_WIDTH, SCREEN_HEIGHT, FIELD_WIDTH)
     clock = p.time.Clock()
     game_ended = False
     while True:
         clock.tick(FPS)
         # handle events
+        if engine.is_game_started:
+            if engine.white_to_move:
+                engine.time_white = engine.time_white - 20
+            else:
+                engine.time_black = engine.time_black - 20
         for event in p.event.get():
             if event.type == p.QUIT or game_ended:
                 sys.exit(0)
