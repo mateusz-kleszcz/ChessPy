@@ -32,8 +32,7 @@ class ChessEngine:
         self.active_square = ()
         self.game_log = []
         self.possible_move_log = []
-        self.all_valid_moves = init_all_valid_moves()
-        self.update_all_valid_moves()
+        self.all_valid_moves = self.get_all_valid_moves()
         self.active_piece_valid_moves = []
         self.board_val = self.calculate_board_val()
 
@@ -73,9 +72,10 @@ class ChessEngine:
 
     # Function returns list of all valid moves by active player. It takes into account situation when
     # move is appropriate in terms of it's direction, but causes opponent to check active player's king.
-    def update_all_valid_moves(self):
-        self.__reset_valid_moves()
+    def get_all_valid_moves(self):
+        # self.__reset_valid_moves()
         all_possible_moves = self.get_all_possible_moves()
+        all_valid_moves = init_all_valid_moves()
         for move in all_possible_moves:
             self.make_move(move, validated_move=False)
             if isinstance(move, Castle):
@@ -83,17 +83,18 @@ class ChessEngine:
                 max_castle_col = max(move.startCol, move.rook_start_col)
                 castle_sq = [(move.startRow, col) for col in range(min_castle_col, max_castle_col + 1)]
 
-            valid_move = True
+            is_move_valid = True
             rival_possible_moves = self.get_all_possible_moves()
             for rival_move in rival_possible_moves:
                 if isinstance(rival_move.capturedPiece, King) or \
                         (isinstance(move, Castle) and (rival_move.endRow, rival_move.endCol) in castle_sq):
-                    valid_move = False
+                    is_move_valid = False
                     break
 
-            if valid_move:
-                self.all_valid_moves[(move.startRow, move.startCol, move.endRow, move.endCol)] = move
+            if is_move_valid:
+                all_valid_moves[(move.startRow, move.startCol, move.endRow, move.endCol)] = move
             self.undo_move(validated_move=False)
+        return all_valid_moves
 
     def __update_en_passant_pawn(self, undo_move_piece=None):
         if undo_move_piece is not None and isinstance(undo_move_piece, Pawn):
@@ -161,11 +162,11 @@ class ChessEngine:
         if validated_move:
             move.movedPiece.is_moved = True
             self.game_log.append(move)
-            self.board_val = self.calculate_board_val()
-            self.update_all_valid_moves()
+            self.all_valid_moves = self.get_all_valid_moves()
         else:
             self.possible_move_log.append(move)
         self.__update_en_passant_pawn()
+        self.board_val = self.calculate_board_val()
 
     def undo_move(self, validated_move=False):
         if validated_move:
@@ -188,8 +189,9 @@ class ChessEngine:
             move.movedPiece = Pawn(move.movedPiece.color, is_moved=True)
         self.white_to_move = not self.white_to_move
         self.__update_en_passant_pawn(move.movedPiece)
+        self.board_val = self.calculate_board_val()
         if validated_move:
-            self.update_all_valid_moves()
+            self.all_valid_moves = self.get_all_valid_moves()
 
     def reset_clicks(self):
         self.active_square = ()
@@ -234,32 +236,33 @@ class ChessEngine:
 
     def make_engine_move(self):
         # move = random.choice(tuple(filter(lambda move: move is not None, self.all_valid_moves.values())))
-        move = self.calculate_engine_move(max_lvl=5)
+        move = self.calculate_engine_move(max_lvl=2)
         self.make_move(move, validated_move=True)
 
     def calculate_engine_move(self, max_lvl, lvl=0):
         if lvl >= max_lvl:
-            return self.calculate_board_val()
+            return self.board_val
         valid_moves = tuple(filter(lambda move: move is not None, self.all_valid_moves.values()))
         best_move = None
         best_val = None
         if self.white_to_move:
             max_ = float('-inf')
             for move in valid_moves:
-                self.make_move(move, validated_move=False)
+                self.make_move(move, validated_move=True)
                 if self.calculate_engine_move(max_lvl, lvl+1) > max_:
                     best_move = move
                     max_ = self.calculate_engine_move(max_lvl, lvl+1)
-                self.undo_move(validated_move=False)
+                self.undo_move(validated_move=True)
             best_val = max_
         else:
             min_ = float('inf')
             for move in valid_moves:
-                self.make_move(move, validated_move=False)
-                if self.calculate_engine_move(max_lvl, lvl+1) < min_:
+                self.make_move(move, validated_move=True)
+                move_val = self.calculate_engine_move(max_lvl, lvl+1)
+                if move_val < min_:
                     best_move = move
-                    min_ = self.calculate_engine_move(max_lvl, lvl+1)
-                self.undo_move(validated_move=False)
+                    min_ = move_val
+                self.undo_move(validated_move=True)
             best_val = min_
         if lvl == 0:
             return best_move
