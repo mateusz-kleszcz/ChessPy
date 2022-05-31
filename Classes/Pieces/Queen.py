@@ -1,6 +1,6 @@
-from Classes.Pieces.Bishop import Bishop
-from Classes.Pieces.Piece import Piece
-from Classes.Pieces.Rook import Rook
+from Pieces.Bishop import Bishop
+from Pieces.Piece import Piece
+from Pieces.Rook import Rook
 
 
 class Queen(Piece):

@@ -1,4 +1,4 @@
-from Classes.Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
+from Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
 
 
 class Knight(PieceWithLimitedMoveDir):
