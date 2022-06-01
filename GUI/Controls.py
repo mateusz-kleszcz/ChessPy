@@ -1,7 +1,9 @@
+from ButtonGroup import ButtonGroup
 from GUI.Button import Button
 
+
 def change_game_mode(engine, value):
-    print(value)
+    engine.game_mode = value
 
 
 def change_time(engine, value):
@@ -15,19 +17,22 @@ def start_game(engine, value):
 
 class Controls:
     def __init__(self, screen):
+        game_mode_group = ButtonGroup("gamemode")
+        time_group = ButtonGroup("time")
         self.buttons = [
-            Button(200, 40, 800, 200, "Hot-seat", "H", change_game_mode),
-            Button(200, 40, 1000, 200, "Komputer", "K", change_game_mode),
-            Button(200, 40, 800, 300, "3 minuty", 3, change_time),
-            Button(200, 40, 1000, 300, "10 minut", 10, change_time),
-            Button(200, 40, 900, 400, "Graj", None, start_game),
+            Button(100, 40, 700, 200, "Hot-seat", "H", change_game_mode, game_mode_group),
+            Button(100, 40, 900, 200, "Komputer", "K", change_game_mode, game_mode_group),
+            Button(100, 40, 1100, 200, "Serwer", "S", change_game_mode, game_mode_group),
+            Button(100, 40, 800, 300, "3 minuty", 3, change_time, time_group),
+            Button(100, 40, 1000, 300, "10 minut", 10, change_time, time_group),
+            Button(100, 40, 900, 400, "Graj", None, start_game, None),
         ]
         self.screen = screen
 
     def handle_button_click(self, location, engine):
         x, y = location
         for button in self.buttons:
-            if button.x <= x <= button.x + button.x + button.size_x and button.y <= y <= button.y + button.size_y:
+            if button.x <= x <= button.x + button.size_x and button.y <= y <= button.y + button.size_y:
                 button.handle_click(engine)
 
     def hide_buttons(self):

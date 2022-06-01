@@ -2,25 +2,39 @@ import pygame
 
 
 class Button:
-    def __init__(self, size_x, size_y, x, y, string, value, action):
+    def __init__(self, size_x, size_y, x, y, string, value, action, group):
         self.size_x = size_x
         self.size_y = size_y
         self.x = x
         self.y = y
         self.value = value
         self.button_box = pygame.Surface((size_x, size_y))
-        self.background = pygame.Rect(0, 0, size_x, size_y)
         pygame.init()
         self.font = pygame.font.SysFont('Arial', 25)
+        self.text = self.font.render(string, True, (255, 255, 0))
         pygame.display.set_caption('Box Test')
-        self.button_box.blit(self.font.render(string, True, (255, 255, 0)), (0, 0))
+        self.button_box.blit(self.text, (10, 5))
         self.on_click = action
+        self.group = group
 
     def add_to_scene(self, screen):
         screen.blit(self.button_box, (self.x, self.y))
 
     def handle_click(self, engine):
         self.on_click(engine, self.value)
+        if self.group is not None:
+            if self.group.selected is not None:
+                self.group.selected.unselect_button()
+            self.select_button()
+            self.group.selected = self
+
+    def select_button(self):
+        self.button_box.fill((100, 100, 100))
+        self.button_box.blit(self.text, (10, 5))
+
+    def unselect_button(self):
+        self.button_box.fill((0, 0, 0))
+        self.button_box.blit(self.text, (10, 5))
 
     def hide_button(self, screen):
         self.button_box.fill((0, 0, 0))

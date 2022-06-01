@@ -4,6 +4,7 @@ from Moves import *
 from GUI import *
 import random
 from Screen import Screen
+from network import Network
 
 ROW_NR = 8
 COL_NR = 8
@@ -38,6 +39,8 @@ class ChessEngine:
         self.is_game_started = False
         self.time_white = 10 * 60 * 1000
         self.time_black = 10 * 60 * 1000
+        self.network = Network()
+        self.game_mode = "H"
 
     def calculate_board_val(self):
         board_val = 0
@@ -227,25 +230,22 @@ class ChessEngine:
                 # show possible moves
                 self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
                                                  self.active_square == (pos[0], pos[1]) and move is not None]
-        else:
-            self.active_square = (row, col)
-            self.clicked_squares.append(self.active_square)
 
-        if len(self.clicked_squares) == 2:
-            move = self.all_valid_moves[(*self.clicked_squares[0], *self.clicked_squares[1])]
-            self.reset_clicks()
-            if move is not None:
-                self.make_move(move, validated_move=True)
-                if len(list(set(list(self.all_valid_moves.values())))) == 1:
-                    self.white_to_move = not self.white_to_move
-                    all_moves_at_the_end = self.get_all_possible_moves()
-                    for end_move in all_moves_at_the_end:
-                        if isinstance(end_move.capturedPiece, King):
-                            winner = "White" if self.white_to_move else "Black"
-                            print(f'Game is ended. {winner} has won!')
-                            return True
-                    print("Game ended with a tie!")
-                    return True
+            if len(self.clicked_squares) == 2:
+                move = self.all_valid_moves[(*self.clicked_squares[0], *self.clicked_squares[1])]
+                self.reset_clicks()
+                if move is not None:
+                    self.make_move(move, validated_move=True)
+                    if len(list(set(list(self.all_valid_moves.values())))) == 1:
+                        self.white_to_move = not self.white_to_move
+                        all_moves_at_the_end = self.get_all_possible_moves()
+                        for end_move in all_moves_at_the_end:
+                            if isinstance(end_move.capturedPiece, King):
+                                winner = "White" if self.white_to_move else "Black"
+                                print(f'Game is ended. {winner} has won!')
+                                return True
+                        print("Game ended with a tie!")
+                        return True
         return False
 
     def make_engine_move(self):
@@ -287,7 +287,12 @@ class ChessEngine:
         self.screen.draw_board(self.active_square, self.active_piece_valid_moves, self)
 
     def start_game(self):
-        self.is_game_started = True
+        if self.game_mode == "H":
+            self.is_game_started = True
+        elif self.game_mode == "K":
+            None
+        elif self.game_mode == "S":
+            self.network.connect()
 
     def end_game(self):
         self.is_game_started = False
