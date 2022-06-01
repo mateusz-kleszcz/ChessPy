@@ -3,7 +3,7 @@ from Moves.Move import Move
 
 
 class Bishop(Piece):
-    def __init__(self, is_white, is_moved=False):
+    def __init__(self, is_white=True, is_moved=False):
         pos_vals = ((-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0),
                     (-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0),
                     (-1.0, 0.0, 0.5, 1.0, 1.0, 1.0, 0.0, -1.0),
