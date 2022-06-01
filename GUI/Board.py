@@ -1,9 +1,9 @@
 import pygame
 
-from GUI.Piece import Piece
+from GUI.Field import Field
 
 BOARD_SIZE = 8
-FIELD_WIDTH = 80
+ACTIVE_BACKGROUND = (117, 199, 232)
 
 
 def get_color(is_field_black):
@@ -14,21 +14,33 @@ def get_color(is_field_black):
 
 
 class Board:
-    def __init__(self, board):
+    def __init__(self, board, field_size):
         self.board = board
-        self.pieces = []
+        self.field_size = field_size
+        self.fields = []
 
-    def draw_board(self, screen):
+    # draw board first time on first render
+    def draw_board(self, screen, active_square, valid_moves):
+        # create fields
         for i, row in enumerate(self.board):
             is_field_black = i % 2
+            row_fields = []
             for j, piece in enumerate(row):
-                square = pygame.Surface((FIELD_WIDTH, FIELD_WIDTH))
-                background = pygame.Rect(0, 0, FIELD_WIDTH, FIELD_WIDTH)
-                pygame.draw.rect(square, get_color(is_field_black), background)
-                if piece is not None:
-                    self.pieces.append(piece)
-                    piece_image = pygame.transform.scale(piece.image, (FIELD_WIDTH, FIELD_WIDTH))
-                    square.blit(piece_image, (0, 0))
-                screen.blit(square, (j * FIELD_WIDTH, i * FIELD_WIDTH))
+                color = get_color(is_field_black)
+                # if square is active change background color
+                if active_square != ():
+                    x, y = active_square
+                    if x == i and y == j:
+                        color = ACTIVE_BACKGROUND
+                square = Field(self.field_size, color, j, i, piece)
                 is_field_black = not is_field_black
+                # add field to list
+                row_fields.append(square)
+                # mark fields that are possible moves
+                for move in valid_moves:
+                    if move.endRow == i and move.endCol == j:
+                        square.mark_field_as_possible_move()
+                screen.blit(square.get_surface(), square.get_screen_position())
+            self.fields.append(row_fields)
+        # add fields to screen
         pygame.display.flip()
