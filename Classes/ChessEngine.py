@@ -189,12 +189,13 @@ class ChessEngine:
         if validated_move:
             move.movedPiece.is_moved = True
             self.game_log.append(move)
+            self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
             self.game_notation.append(self.make_move_notation(move))
         else:
+            self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
-        self.__update_en_passant_pawn()
-        self.board_val = self.calculate_board_val()
+        # self.board_val = self.calculate_board_val()
 
     def undo_move(self, validated_move=False):
         if validated_move:
