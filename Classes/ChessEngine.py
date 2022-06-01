@@ -14,15 +14,6 @@ def init_all_valid_moves():
             for er in range(ROW_NR) for ec in range(COL_NR)}
 
 
-def static_vars(**kwargs):
-    def init(func):
-        for k in kwargs:
-            setattr(func, k, kwargs[k])
-        return func
-
-    return init
-
-
 class ChessEngine:
     def __init__(self, screen_width, screen_height, row_size):
         self.board = [
@@ -48,6 +39,7 @@ class ChessEngine:
         self.game_notation = []
         self.is_game_over = False
         self.winner = None
+        self.is_check = False
 
     def calculate_board_val(self):
         board_val = 0
@@ -67,7 +59,7 @@ class ChessEngine:
                 if isinstance(end_move.capturedPiece, King):
                     self.is_game_over = True
                     self.winner = 1 if self.white_to_move else -1
-                    self.game_notation.append(self.game_notation.pop() + "++")
+                    self.game_notation.append(self.game_notation.pop() + "+")
                     winner = "White" if self.white_to_move else "Black"
                     print(f'Game is ended. {winner} has won!')
                     return
@@ -188,10 +180,11 @@ class ChessEngine:
         self.white_to_move = not self.white_to_move
         if validated_move:
             move.movedPiece.is_moved = True
+            self.check_if_check()
             self.game_log.append(move)
+            self.game_notation.append(self.make_move_notation(move))
             self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
-            self.game_notation.append(self.make_move_notation(move))
         else:
             self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
@@ -224,11 +217,15 @@ class ChessEngine:
             self.all_valid_moves = self.calculate_all_valid_moves()
 
     def make_move_notation(self, move):
+        if self.is_check:
+            check = "+"
+        else:
+            check = ""
         if isinstance(move, Castle):
             if move.endCol == 6:
-                return '0-0'
+                return '0-0' + check
             elif move.endCol == 2:
-                return '0-0-0'
+                return '0-0-0' + check
             else:
                 raise ValueError('Invalid castle move!')
 
@@ -255,7 +252,13 @@ class ChessEngine:
             move_notation = move_notation[:-2] + "x" + move_notation[-2:]
         if move_notation[0] == Pawn().name:
             move_notation = move_notation[1:]
-        return move_notation
+        return move_notation + check
+
+    def check_if_check(self):
+        self.white_to_move = not self.white_to_move
+        moves = self.calculate_all_possible_moves()
+        self.is_check = len(set(filter(lambda move: move is not None and isinstance(move.capturedPiece, King), moves))) > 0
+        self.white_to_move = not self.white_to_move
 
     def get_move_from_notation(self, notation):
         if notation == '0-0':
@@ -341,7 +344,8 @@ class ChessEngine:
                 result = "0.5-0.5"
             csv_writer.writerow([result])
 
-    def read_game_from_csv(self, path):
+    @staticmethod
+    def read_game_from_csv(path):
         with open(path, 'r') as game_notation_file:
             moves = []
             csv_read = csv.reader(game_notation_file)
