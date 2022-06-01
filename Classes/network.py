@@ -13,7 +13,6 @@ class Network:
         self.id = -1
 
     def connect(self):
-        print(self.address)
         self.client.connect(self.address)
         self.id = self.client.recv(2048).decode()
 

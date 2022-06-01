@@ -39,8 +39,8 @@ class ChessEngine:
         self.is_game_started = False
         self.time_white = 10 * 60 * 1000
         self.time_black = 10 * 60 * 1000
-        self.network = Network()
         self.game_mode = "H"
+        self.network = Network()
 
     def calculate_board_val(self):
         board_val = 0
@@ -173,6 +173,13 @@ class ChessEngine:
             self.possible_move_log.append(move)
         self.__update_en_passant_pawn()
         self.board_val = self.calculate_board_val()
+        try:
+            if self.game_mode == "S" and validated_move:
+                data = str(move.startRow) + ":" + str(move.startCol) + ":" + str(move.endRow) + ":" + str(move.endCol)
+                print(data)
+                reply = self.network.send(data)
+        except:
+            None
 
     def undo_move(self, validated_move=False):
         if validated_move:
@@ -293,6 +300,7 @@ class ChessEngine:
             None
         elif self.game_mode == "S":
             self.network.connect()
+            self.is_game_started = True
 
     def end_game(self):
         self.is_game_started = False
