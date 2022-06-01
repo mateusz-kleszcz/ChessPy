@@ -4,7 +4,7 @@ from Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
 class Knight(PieceWithLimitedMoveDir):
     moves_dir = [(1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2)]
 
-    def __init__(self, is_white, is_moved=False):
+    def __init__(self, is_white=True, is_moved=False):
         pos_vals = ((-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0),
                     (-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0),
                     (-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0),

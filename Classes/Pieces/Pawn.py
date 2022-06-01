@@ -6,7 +6,7 @@ from Moves.Move import Move
 
 class Pawn(Piece):
 
-    def __init__(self, is_white, is_moved=False):
+    def __init__(self, is_white=True, is_moved=False):
         pos_vals = ((0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
                     (5.0, 5.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0),
                     (1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0),

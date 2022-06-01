@@ -17,7 +17,8 @@ s.listen(2)
 print("Waiting for a connection", server_ip)
 
 currentId = "0"
-pos = ["0:50,50", "1:100,100"]
+lastMoveWhite = ''
+lastMoveBlack = ''
 
 
 def threaded_client(connection):

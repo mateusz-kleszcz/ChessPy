@@ -6,7 +6,7 @@ from Pieces.Rook import Rook
 class King(PieceWithLimitedMoveDir):
     moves_dir = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (-1, 0)]
 
-    def __init__(self, is_white):
+    def __init__(self, is_white=True):
         pos_vals = ((-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
                     (-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
                     (-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0),
