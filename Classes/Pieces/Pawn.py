@@ -1,7 +1,7 @@
-from EnPassantMove import EnPassantMove
-from PawnPromotion import PawnPromotion
-from Pieces import Piece
-from Moves.Move import Move
+from Classes.Moves.EnPassantMove import EnPassantMove
+from Classes.Moves.PawnPromotion import PawnPromotion
+from Classes.Pieces.Piece import Piece
+from Classes.Moves.Move import Move
 
 
 class Pawn(Piece):

@@ -1,5 +1,4 @@
 import pygame
-
 from GUI.Field import Field
 
 BOARD_SIZE = 8
