@@ -1,4 +1,4 @@
-from ButtonGroup import ButtonGroup
+from GUI.ButtonGroup import ButtonGroup
 from GUI.Button import Button
 
 

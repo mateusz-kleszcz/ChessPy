@@ -1,8 +1,15 @@
 import pygame as p
+
+# from Classes.Pieces.Pawn import Pawn
+# from Classes.Pieces.Knight import Knight
+# from Classes.Pieces.Bishop import Bishop
+# from Classes.Pieces.Rook import Rook
+# from Classes.Pieces.Queen import Queen
+# from Classes.Pieces.King import King
+
 from Pieces import *
 from Moves import *
 from GUI import *
-import random
 from Screen import Screen
 from network import Network
 import csv
@@ -150,7 +157,7 @@ class ChessEngine:
             if isinstance(last_but_one_moved_piece, Pawn):
                 last_but_one_moved_piece.en_passant = False
 
-    def make_move(self, move, validated_move=False):
+    def make_move(self, move, validated_move=False, read=False, enemy=False):
         self.board[move.startRow][move.startCol] = None
         self.board[move.endRow][move.endCol] = move.movedPiece
         if isinstance(move, EnPassantMove):
@@ -161,42 +168,51 @@ class ChessEngine:
             rook.is_moved = True
             self.board[move.startRow][move.rook_end_col] = rook
         elif isinstance(move, PawnPromotion) and validated_move:
-            # print("Choose promoted piece:\n[Q] -> Queen\n[R] -> Rook\n[B] -> Bishup\n[K] -> Knight\n")
-            # t = True
-            # while t:
-            #     for event in p.event.get():
-            #         if event.type == p.KEYDOWN:
-            #             if event.key == p.K_q:
-            #                 promoted_piece_type = Queen
-            #             elif event.key == p.K_r:
-            #                 promoted_piece_type = Rook
-            #             elif event.key == p.K_b:
-            #                 promoted_piece_type = Bishop
-            #             elif event.key == p.K_k:
-            #                 promoted_piece_type = Knight
-            #             t = False
-            #             break
-            promoted_piece_type = Queen
-            # if promoted_piece == "Q":
-            #     promoted_piece_type = Queen
-            # elif promoted_piece == "R":
-            #     promoted_piece_type = Rook
-            # elif promoted_piece == "B":
-            #     promoted_piece_type = Bishop
-            # elif promoted_piece == "K":
-            #     promoted_piece_type = Knight
-            # else:
-            #     raise KeyError("No valid piece was promoted")
-            self.board[move.endRow][move.endCol] = promoted_piece_type(move.movedPiece.color, is_moved=True)
+            if not read:
+                print("Choose promoted piece:\n[Q] -> Queen\n[R] -> Rook\n[B] -> Bishup\n[K] -> Knight\n")
+
+                def choose_promoted_piece():
+                    paused = True
+                    promoted_piece_type = None
+                    FPS = 50
+                    clock = p.time.Clock()
+                    # TODO: interactive menu
+                    while paused:
+                        clock.tick(FPS)
+                        for event in p.event.get():
+                            if event.type == p.KEYDOWN:
+                                if event.key == p.K_q:
+                                    promoted_piece_type = Queen
+                                elif event.key == p.K_r:
+                                    promoted_piece_type = Rook
+                                elif event.key == p.K_b:
+                                    promoted_piece_type = Bishop
+                                elif event.key == p.K_k:
+                                    promoted_piece_type = Knight
+                                paused = False
+                    return promoted_piece_type
+                move.promotedPieceType = choose_promoted_piece()
+
+            self.board[move.endRow][move.endCol] = move.promotedPieceType(move.movedPiece.color, is_moved=True)
         self.white_to_move = not self.white_to_move
         if validated_move:
             move.movedPiece.is_moved = True
             self.check_if_check()
             self.game_log.append(move)
-            self.game_notation.append(self.make_move_notation(move))
+            move_notation = self.make_move_notation(move)
+            self.game_notation.append(move_notation)
+            if not enemy:
+                if self.is_player_white:
+                    self.last_move_white = move_notation
+                else:
+                    self.last_move_black = move_notation
+            else:
+                if self.is_player_white:
+                    self.last_move_black = move_notation
+                else:
+                    self.last_move_white = move_notation
             self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
-            print(self.make_move_notation(move))
         else:
             self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
@@ -286,6 +302,10 @@ class ChessEngine:
             else:
                 return self.all_valid_moves.get((0, 4, 0, 4))
         notation = notation.replace('x', '').replace('+', '').replace('=', '')
+        promoted_piece_name = ''
+        if '8' < notation[-1] < 'a':
+            promoted_piece_name = notation[-1]
+            notation = notation[:-1]
         piece = None
         color = self.white_to_move
         if notation[0] < 'a':
@@ -328,9 +348,18 @@ class ChessEngine:
             moves = list(filter(lambda move_: move_.startCol == start_col and move_.start_row == start_row, moves))
         else:
             raise ValueError("Invalid move notation length!")
-
         if len(moves) == 1:
             move = moves[0]
+            if promoted_piece_name:
+                if promoted_piece_name == 'N':
+                    promoted_piece_type = Knight
+                elif promoted_piece_name == 'B':
+                    promoted_piece_type = Bishop
+                elif promoted_piece_name == 'R':
+                    promoted_piece_type = Rook
+                elif promoted_piece_name == 'Q':
+                    promoted_piece_type = Queen
+                move.promotedPieceType = promoted_piece_type
             return move
         elif len(moves) == 0:
             raise ValueError("None valid move was parsed from notation!")
@@ -340,7 +369,7 @@ class ChessEngine:
     def play_saved_game(self, game_notation):
         move_notation = game_notation[len(self.game_notation)]
         move = self.get_move_from_notation(move_notation)
-        self.make_move(move, validated_move=True)
+        self.make_move(move, validated_move=True, read=True)
         self.__check_if_game_is_over()
         return self.is_game_over
 
@@ -405,10 +434,6 @@ class ChessEngine:
             self.reset_clicks()
             if move is not None:
                 self.make_move(move, validated_move=True)
-                if self.is_player_white:
-                    self.last_move_white = self.make_move_notation(move)
-                else:
-                    self.last_move_black = self.make_move_notation(move)
                 self.__check_if_game_is_over()
         return self.is_game_over
 
@@ -477,7 +502,7 @@ class ChessEngine:
     def check_is_enemy_moved(self, reply):
         move_white, move_black = reply.split(":")
         last_enemy_move = move_black if self.is_player_white else move_white
-        last_player_move = self.last_move_white if self.white_to_move else self.last_move_black
-        if last_enemy_move != last_player_move:
-            print(last_enemy_move)
-            # self.get_move_from_notation(last_enemy_move)
+        if last_enemy_move != self.last_move_white and last_enemy_move != self.last_move_black:
+            print(last_enemy_move, self.last_move_white, self.last_move_black)
+            move = self.get_move_from_notation(last_enemy_move)
+            self.make_move(move, validated_move=True, read=True, enemy=True)
