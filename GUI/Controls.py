@@ -2,9 +2,7 @@ from GUI.ButtonGroup import ButtonGroup
 from GUI.Button import Button
 import easygui
 
-
-game_notation = ""
-game_ended = ""
+from Label import Label
 
 
 def change_game_mode(engine, value):
@@ -20,23 +18,6 @@ def start_game(engine, value):
     engine.start_game()
 
 
-def analyse_game(engine, value):
-    global game_notation
-    engine.is_game_analysed = True
-    path = easygui.fileopenbox()
-    game_notation = engine.read_game_from_csv(path)
-
-
-def change_move(engine, value):
-    global game_notation
-    if value == 1:
-        engine.play_saved_game(game_notation)
-    if value == 0:
-        engine.is_game_analysed = False
-    if value == -1:
-        engine.undo_move(validated_move=True)
-
-
 class Controls:
     def __init__(self, screen):
         game_mode_group = ButtonGroup("gamemode")
@@ -48,14 +29,17 @@ class Controls:
             Button(100, 40, 800, 300, "3 minuty", 3, change_time, time_group),
             Button(100, 40, 1000, 300, "10 minut", 10, change_time, time_group),
             Button(100, 40, 1000, 400, "Graj", None, start_game, None),
-            Button(100, 40, 800, 400, "CSV", None, analyse_game, None),
+            Button(100, 40, 800, 400, "CSV", None, self.analyse_game, None),
         ]
         self.csv_buttons = [
-            Button(100, 40, 1020, 250, ">", 1, change_move, None),
-            Button(100, 40, 820, 250, "<", -1, change_move, None),
-            Button(100, 40, 894, 350, "Powrót", 0, change_move, None),
+            Button(100, 40, 1020, 250, ">", 1, self.change_move, None),
+            Button(100, 40, 820, 250, "<", -1, self.change_move, None),
+            Button(100, 40, 894, 350, "Powrót", 0, self.change_move, None),
         ]
+        self.fen_label = Label(screen, 900, 150)
         self.screen = screen
+        self.game_notation = ""
+        self.last_move = ""
 
     def handle_button_click(self, location, engine):
         x, y = location
@@ -77,7 +61,29 @@ class Controls:
     def draw_csv_buttons(self):
         for button in self.csv_buttons:
             button.add_to_scene(self.screen)
+        self.fen_label.add_to_scene(self.last_move)
 
     def hide_csv_buttons(self):
         for button in self.csv_buttons:
             button.hide_button(self.screen)
+        self.fen_label.hide_label()
+
+    def analyse_game(self, engine, value):
+        engine.is_game_analysed = True
+        try:
+            path = easygui.fileopenbox()
+            self.game_notation = engine.read_game_from_csv(path)
+        except TypeError as e:
+            print(str(e))
+
+
+    def change_move(self, engine, value):
+        print(self.game_notation)
+        if value == 1:
+            engine.play_saved_game(self.game_notation)
+        if value == 0:
+            engine.is_game_analysed = False
+        if value == -1:
+            engine.undo_move(validated_move=True)
+        if len(engine.game_notation) != 0:
+            self.last_move = engine.game_notation[-1]
