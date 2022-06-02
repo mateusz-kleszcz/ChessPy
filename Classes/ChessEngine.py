@@ -1,14 +1,22 @@
 import pygame as p
+
+# from Classes.Pieces.Pawn import Pawn
+# from Classes.Pieces.Knight import Knight
+# from Classes.Pieces.Bishop import Bishop
+# from Classes.Pieces.Rook import Rook
+# from Classes.Pieces.Queen import Queen
+# from Classes.Pieces.King import King
+
 from Pieces import *
 from Moves import *
 from GUI import *
-import random
 from Screen import Screen
 from network import Network
 import csv
 
 ROW_NR = 8
 COL_NR = 8
+
 
 def init_all_valid_moves():
     return {(sr, sc, er, ec): None for sr in range(ROW_NR) for sc in range(COL_NR)
@@ -145,7 +153,7 @@ class ChessEngine:
             if isinstance(last_but_one_moved_piece, Pawn):
                 last_but_one_moved_piece.en_passant = False
 
-    def make_move(self, move, validated_move=False):
+    def make_move(self, move, validated_move=False, read=False):
         self.board[move.startRow][move.startCol] = None
         self.board[move.endRow][move.endCol] = move.movedPiece
         if isinstance(move, EnPassantMove):
@@ -156,33 +164,32 @@ class ChessEngine:
             rook.is_moved = True
             self.board[move.startRow][move.rook_end_col] = rook
         elif isinstance(move, PawnPromotion) and validated_move:
-            # print("Choose promoted piece:\n[Q] -> Queen\n[R] -> Rook\n[B] -> Bishup\n[K] -> Knight\n")
-            # t = True
-            # while t:
-            #     for event in p.event.get():
-            #         if event.type == p.KEYDOWN:
-            #             if event.key == p.K_q:
-            #                 promoted_piece_type = Queen
-            #             elif event.key == p.K_r:
-            #                 promoted_piece_type = Rook
-            #             elif event.key == p.K_b:
-            #                 promoted_piece_type = Bishop
-            #             elif event.key == p.K_k:
-            #                 promoted_piece_type = Knight
-            #             t = False
-            #             break
-            promoted_piece_type = Queen
-            # if promoted_piece == "Q":
-            #     promoted_piece_type = Queen
-            # elif promoted_piece == "R":
-            #     promoted_piece_type = Rook
-            # elif promoted_piece == "B":
-            #     promoted_piece_type = Bishop
-            # elif promoted_piece == "K":
-            #     promoted_piece_type = Knight
-            # else:
-            #     raise KeyError("No valid piece was promoted")
-            self.board[move.endRow][move.endCol] = promoted_piece_type(move.movedPiece.color, is_moved=True)
+            if not read:
+                print("Choose promoted piece:\n[Q] -> Queen\n[R] -> Rook\n[B] -> Bishup\n[K] -> Knight\n")
+
+                def choose_promoted_piece():
+                    paused = True
+                    promoted_piece_type = None
+                    FPS = 50
+                    clock = p.time.Clock()
+                    # TODO: interactive menu
+                    while paused:
+                        clock.tick(FPS)
+                        for event in p.event.get():
+                            if event.type == p.KEYDOWN:
+                                if event.key == p.K_q:
+                                    promoted_piece_type = Queen
+                                elif event.key == p.K_r:
+                                    promoted_piece_type = Rook
+                                elif event.key == p.K_b:
+                                    promoted_piece_type = Bishop
+                                elif event.key == p.K_k:
+                                    promoted_piece_type = Knight
+                                paused = False
+                    return promoted_piece_type
+                move.promotedPieceType = choose_promoted_piece()
+
+            self.board[move.endRow][move.endCol] = move.promotedPieceType(move.movedPiece.color, is_moved=True)
         self.white_to_move = not self.white_to_move
         if validated_move:
             move.movedPiece.is_moved = True
@@ -242,6 +249,7 @@ class ChessEngine:
             else:
                 raise ValueError('Invalid castle move!')
 
+        pawn_promotion = move.promotedPieceType().name if isinstance(move, PawnPromotion) else ""
         move_notation = move.get_notation()
         from operator import itemgetter
         moves_to_end_sq = itemgetter(
@@ -265,7 +273,7 @@ class ChessEngine:
             move_notation = move_notation[:-2] + "x" + move_notation[-2:]
         if move_notation[0] == Pawn().name:
             move_notation = move_notation[1:]
-        return move_notation + check
+        return move_notation + pawn_promotion + check
 
     def check_if_check(self):
         self.white_to_move = not self.white_to_move
@@ -285,6 +293,10 @@ class ChessEngine:
             else:
                 return self.all_valid_moves.get((0, 4, 0, 4))
         notation = notation.replace('x', '').replace('+', '').replace('=', '')
+        promoted_piece_name = ''
+        if '8' < notation[-1] < 'a':
+            promoted_piece_name = notation[-1]
+            notation = notation[:-1]
         piece = None
         color = self.white_to_move
         if notation[0] < 'a':
@@ -327,9 +339,18 @@ class ChessEngine:
             moves = list(filter(lambda move_: move_.startCol == start_col and move_.start_row == start_row, moves))
         else:
             raise ValueError("Invalid move notation length!")
-
         if len(moves) == 1:
             move = moves[0]
+            if promoted_piece_name:
+                if promoted_piece_name == 'N':
+                    promoted_piece_type = Knight
+                elif promoted_piece_name == 'B':
+                    promoted_piece_type = Bishop
+                elif promoted_piece_name == 'R':
+                    promoted_piece_type = Rook
+                elif promoted_piece_name == 'Q':
+                    promoted_piece_type = Queen
+                move.promotedPieceType = promoted_piece_type
             return move
         elif len(moves) == 0:
             raise ValueError("None valid move was parsed from notation!")
@@ -339,7 +360,7 @@ class ChessEngine:
     def play_saved_game(self, game_notation):
         move_notation = game_notation[len(self.game_notation)]
         move = self.get_move_from_notation(move_notation)
-        self.make_move(move, validated_move=True)
+        self.make_move(move, validated_move=True, read=True)
         self.__check_if_game_is_over()
         return self.is_game_over
 
