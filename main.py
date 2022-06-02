@@ -3,8 +3,8 @@ import sys
 from Classes.ChessEngine import ChessEngine
 
 
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+SCREEN_WIDTH = 1240
+SCREEN_HEIGHT = 640
 FIELD_WIDTH = 80
 FPS = 50
 

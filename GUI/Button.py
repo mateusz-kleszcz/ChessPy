@@ -11,7 +11,7 @@ class Button:
         self.button_box = pygame.Surface((size_x, size_y))
         pygame.init()
         self.font = pygame.font.SysFont('Arial', 25)
-        self.text = self.font.render(string, True, (255, 255, 0))
+        self.text = self.font.render(string, True, (207, 216, 220))
         pygame.display.set_caption('Box Test')
         self.button_box.blit(self.text, (10, 5))
         self.on_click = action
@@ -29,7 +29,7 @@ class Button:
             self.group.selected = self
 
     def select_button(self):
-        self.button_box.fill((100, 100, 100))
+        self.button_box.fill((211, 47, 47))
         self.button_box.blit(self.text, (10, 5))
 
     def unselect_button(self):
