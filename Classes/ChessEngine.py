@@ -89,11 +89,13 @@ class ChessEngine:
                     self.game_notation.append(self.game_notation.pop() + "+")
                     winner = "White" if self.white_to_move else "Black"
                     print(f'Game is ended. {winner} has won!')
+                    self.white_to_move = not self.white_to_move
                     return
             self.is_game_over = True
             self.is_game_started = False
             self.winner = 0
             print("Game ended with a tie!")
+            self.white_to_move = not self.white_to_move
 
     def __reset_valid_moves(self):
         self.all_valid_moves = {k: None for k, v in self.all_valid_moves.items()}
@@ -223,6 +225,7 @@ class ChessEngine:
                     self.last_move_white = move_notation
             self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
+            self.__check_if_game_is_over()
         else:
             self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
@@ -383,7 +386,6 @@ class ChessEngine:
             move_notation = saved_game_notation[current_game_len]
             move = self.get_move_from_notation(move_notation)
             self.make_move(move, validated_move=True, read=True)
-            self.__check_if_game_is_over()
         return self.is_game_over
 
     def save_game_to_csv(self, path):
@@ -445,7 +447,6 @@ class ChessEngine:
             self.reset_clicks()
             if move is not None:
                 self.make_move(move, validated_move=True)
-                self.__check_if_game_is_over()
         return self.is_game_over
 
     def make_engine_move(self):
