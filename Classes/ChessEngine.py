@@ -226,6 +226,7 @@ class ChessEngine:
                     self.last_move_white = move_notation
             self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
+            self.__check_if_game_is_over()
         else:
             self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
@@ -386,7 +387,6 @@ class ChessEngine:
             move_notation = saved_game_notation[current_game_len]
             move = self.get_move_from_notation(move_notation)
             self.make_move(move, validated_move=True, read=True)
-            self.__check_if_game_is_over()
         return self.is_game_over
 
     def save_game_to_csv(self, path):
@@ -448,7 +448,6 @@ class ChessEngine:
             self.reset_clicks()
             if move is not None:
                 self.make_move(move, validated_move=True)
-                self.__check_if_game_is_over()
         return self.is_game_over
 
     def make_engine_move(self):
