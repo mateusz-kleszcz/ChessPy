@@ -3,8 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="300db9e4-ccdc-401e-8110-c96918e88334" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Classes/ChessEngine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/ChessEngine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Classes/network.py" beforeDir="false" afterPath="$PROJECT_DIR$/Classes/network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GUI/Controls.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI/Controls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GUI/Label.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI/Label.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GUI/Screen.py" beforeDir="false" afterPath="$PROJECT_DIR$/GUI/Screen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Games/#1" beforeDir="false" afterPath="$PROJECT_DIR$/Games/#1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +147,7 @@
       <workItem from="1651822819482" duration="2500000" />
       <workItem from="1651834211688" duration="1077000" />
       <workItem from="1654077211339" duration="34014000" />
-      <workItem from="1654196357856" duration="8335000" />
+      <workItem from="1654196357856" duration="10305000" />
     </task>
     <servers />
   </component>
@@ -162,8 +167,8 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/chessPy$server.coverage" NAME="server Coverage Results" MODIFIED="1654198855803" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/server" />
+    <SUITE FILE_PATH="coverage/chessPy$server.coverage" NAME="server Coverage Results" MODIFIED="1654209031836" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/server" />
     <SUITE FILE_PATH="coverage/chessPy$ChessEngine.coverage" NAME="ChessEngine Coverage Results" MODIFIED="1649019628592" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/chessPy$main.coverage" NAME="main Coverage Results" MODIFIED="1654207057775" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/chessPy$main.coverage" NAME="main Coverage Results" MODIFIED="1654209037173" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

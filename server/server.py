@@ -21,9 +21,10 @@ clients_num = 0
 
 last_move_white = ""
 last_move_black = ""
+end = False
 
 def threaded_client(connection):
-    global currentId, last_move_white, last_move_black
+    global currentId, last_move_white, last_move_black, end, clients_num
     connection.send(str.encode(currentId))
     currentId = "1"
     reply = ''
@@ -40,6 +41,8 @@ def threaded_client(connection):
                         reply = "WAITING"
                     if clients_num == 2:
                         reply = "START"
+                elif reply == "END":
+                    end = True
                 else:
                     params = reply.split(":")
                     if params[0] == "W":
@@ -47,7 +50,8 @@ def threaded_client(connection):
                     elif params[0] == "B":
                         last_move_black = params[1]
                     reply = last_move_white + ":" + last_move_black
-                print(reply)
+                if end:
+                    reply = "END"
                 connection.sendall(str.encode(reply))
 
         except error as e:
@@ -55,11 +59,13 @@ def threaded_client(connection):
             break
 
     print("Connection Closed")
+    clients_num -= 1
     connection.close()
 
 
 while True:
     connection, address = s.accept()
     print("Connected to: ", address)
+    end = False
     clients_num += 1
     start_new_thread(threaded_client, (connection, ))

@@ -19,6 +19,13 @@ class Network:
         except socket.error as e:
             return str(e)
 
+    def disconnect(self):
+        try:
+            self.client.close()
+            self.id = "-1"
+        except socket.error as e:
+            return str(e)
+
     def send(self, data):
         try:
             self.client.send(str.encode(data))

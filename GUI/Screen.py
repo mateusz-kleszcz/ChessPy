@@ -7,7 +7,7 @@ from Label import Label
 
 
 class Screen:
-    def __init__(self, width, height, field_size, board):
+    def __init__(self, board, width=1240, height=640, field_size=80):
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height))
@@ -16,7 +16,7 @@ class Screen:
         self.time = 10
         self.controls = Controls(self.screen)
         self.game_over_label = Label(self.screen, 870, 100)
-        self.waiting_label = Label(self.screen, 850, 250)
+        self.waiting_label = Label(self.screen, 800, 250)
         self.timer_white = Timer(200, "Czas białego:", self.screen)
         self.timer_black = Timer(300, "Czas czarnego:", self.screen)
 
@@ -35,6 +35,7 @@ class Screen:
                     self.game_over_label.add_to_scene("Wygrały białe")
                 else:
                     self.game_over_label.add_to_scene("Wygrały czarne")
+                self.waiting_label.hide_label()
             if not engine.is_game_started:
                 if engine.game_mode == "S" and engine.network.id != "-1":
                     self.waiting_label.add_to_scene("Oczekuję na drugiego gracza")
@@ -43,6 +44,7 @@ class Screen:
                     self.timer_white.hide_timer()
                     self.timer_black.hide_timer()
                     self.controls.draw_buttons()
+                    self.waiting_label.hide_label()
             else:
                 self.controls.hide_buttons()
                 self.timer_white.draw_timer(engine.time_white)
