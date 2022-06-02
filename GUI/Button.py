@@ -18,6 +18,7 @@ class Button:
         self.group = group
 
     def add_to_scene(self, screen):
+        self.button_box.blit(self.text, (10, 5))
         screen.blit(self.button_box, (self.x, self.y))
 
     def handle_click(self, engine):

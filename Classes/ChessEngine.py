@@ -1,15 +1,8 @@
 import pygame as p
 
-# from Classes.Pieces.Pawn import Pawn
-# from Classes.Pieces.Knight import Knight
-# from Classes.Pieces.Bishop import Bishop
-# from Classes.Pieces.Rook import Rook
-# from Classes.Pieces.Queen import Queen
-# from Classes.Pieces.King import King
 
 from Pieces import *
 from Moves import *
-from GUI import *
 from Screen import Screen
 from network import Network
 import csv
@@ -23,19 +16,21 @@ def init_all_valid_moves():
             for er in range(ROW_NR) for ec in range(COL_NR)}
 
 
+init_board = [
+    [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False), Rook(False)],
+    [Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False)],
+    [None, None, None, None, None, None, None, None],
+    [None, None, None, None, None, None, None, None],
+    [None, None, None, None, None, None, None, None],
+    [None, None, None, None, None, None, None, None],
+    [Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True)],
+    [Rook(True), Knight(True), Bishop(True), Queen(True), King(True), Bishop(True), Knight(True), Rook(True)],
+]
+
+
 class ChessEngine:
     def __init__(self, screen_width, screen_height, row_size):
-        self.board = [
-            [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False),
-             Rook(False)],
-            [Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False)],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True)],
-            [Rook(True), Knight(True), Bishop(True), Queen(True), King(True), Bishop(True), Knight(True), Rook(True)],
-        ]
+        self.board = init_board
         self.white_to_move = True
         self.screen = Screen(screen_width, screen_height, row_size, self.board)
         self.clicked_squares = []
@@ -58,6 +53,7 @@ class ChessEngine:
         self.is_player_white = None
         self.last_move_white = ""
         self.last_move_black = ""
+        self.is_game_analysed = False
 
     def calculate_board_val(self):
         board_val = 0
@@ -76,12 +72,14 @@ class ChessEngine:
             for end_move in all_moves_at_the_end:
                 if isinstance(end_move.capturedPiece, King):
                     self.is_game_over = True
+                    self.is_game_started = False
                     self.winner = 1 if self.white_to_move else -1
                     self.game_notation.append(self.game_notation.pop() + "+")
                     winner = "White" if self.white_to_move else "Black"
                     print(f'Game is ended. {winner} has won!')
                     return
             self.is_game_over = True
+            self.is_game_started = False
             self.winner = 0
             print("Game ended with a tie!")
 

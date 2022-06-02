@@ -15,6 +15,10 @@ def start_game(engine, value):
     engine.start_game()
 
 
+def analize_game(engine, value):
+    engine.is_game_analysed = True
+
+
 class Controls:
     def __init__(self, screen):
         game_mode_group = ButtonGroup("gamemode")
@@ -25,7 +29,8 @@ class Controls:
             Button(100, 40, 1100, 200, "Serwer", "S", change_game_mode, game_mode_group),
             Button(100, 40, 800, 300, "3 minuty", 3, change_time, time_group),
             Button(100, 40, 1000, 300, "10 minut", 10, change_time, time_group),
-            Button(100, 40, 900, 400, "Graj", None, start_game, None),
+            Button(100, 40, 1000, 400, "Graj", None, start_game, None),
+            Button(100, 40, 800, 400, "CSV", None, analize_game, None),
         ]
         self.screen = screen
 

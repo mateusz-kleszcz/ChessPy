@@ -1,9 +1,14 @@
 import pygame
 
+from Button import Button
 from GUI.Board import Board
 from GUI.Controls import Controls
 from GUI.Timer import Timer
 from Label import Label
+
+
+def change_move(move):
+    print("E")
 
 
 class Screen:
@@ -15,18 +20,41 @@ class Screen:
         self.game_started = False
         self.time = 10
         self.controls = Controls(self.screen)
+        self.game_over_label = Label(self.screen, 870, 100)
+        self.waiting_label = Label(self.screen, 850, 250)
+        self.timer_white = Timer(200, "Czas białego:")
+        self.timer_black = Timer(300, "Czas czarnego:")
+        self.next_button = Button(100, 40, 1020, 500, ">", 1, change_move, None)
+        self.prev_button = Button(100, 40, 820, 500, "<", 1, change_move, None)
 
     def draw_board(self, active_square, possible_moves, engine):
-        if not engine.is_game_started:
-            if engine.game_mode == "S" and engine.network.id != "-1":
-                self.controls.hide_buttons()
-                Label(self.screen, 850, 250, "Oczekuję na drugiego gracza")
-            else:
-                self.controls.draw_buttons()
-        else:
+        if engine.is_game_analysed:
+            self.game_over_label.hide_label()
+            self.waiting_label.hide_label()
             self.controls.hide_buttons()
-            Timer(self.screen, engine.time_white, 200, "Czas białego:")
-            Timer(self.screen, engine.time_black, 300, "Czas czarnego:")
+            self.timer_white.hide_timer(self.screen)
+            self.timer_black.hide_timer(self.screen)
+            self.next_button.add_to_scene(self.screen)
+            self.prev_button.add_to_scene(self.screen)
+        else:
+            if engine.is_game_over:
+                if engine.winner == 1:
+                    self.game_over_label.add_to_scene("Wygrały białe")
+                else:
+                    self.game_over_label.add_to_scene("Wygrały czarne")
+            if not engine.is_game_started:
+                if engine.game_mode == "S" and engine.network.id != "-1":
+                    self.waiting_label.add_to_scene("Oczekuję na drugiego gracza")
+                    self.controls.hide_buttons()
+                else:
+                    self.timer_white.hide_timer(self.screen)
+                    self.timer_black.hide_timer(self.screen)
+                    self.controls.draw_buttons()
+            else:
+                self.controls.hide_buttons()
+                self.timer_white.draw_timer(self.screen, engine.time_white)
+                self.timer_black.draw_timer(self.screen, engine.time_black)
+                self.waiting_label.hide_label()
         self.board.draw_board(self.screen, active_square, possible_moves)
 
     def get_square_position(self, location):
