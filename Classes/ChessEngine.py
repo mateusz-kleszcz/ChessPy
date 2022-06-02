@@ -474,6 +474,7 @@ class ChessEngine:
         self.screen.draw_board(self.active_square, self.active_piece_valid_moves, self)
 
     def start_game(self):
+        self.board = init_board
         if self.game_mode == "H":
             self.is_game_started = True
         elif self.game_mode == "K":
