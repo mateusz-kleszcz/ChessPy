@@ -1,21 +1,20 @@
 import pygame as p
-
-# from Classes.Pieces.Pawn import Pawn
-# from Classes.Pieces.Knight import Knight
-# from Classes.Pieces.Bishop import Bishop
-# from Classes.Pieces.Rook import Rook
-# from Classes.Pieces.Queen import Queen
-# from Classes.Pieces.King import King
+import chess
+import chess.engine
+import csv
+from network import Network
 
 from Classes.Pieces import *
 from Classes.Moves import *
 from GUI import *
 from GUI.Screen import Screen
-from network import Network
-import csv
 
 ROW_NR = 8
 COL_NR = 8
+
+SCREEN_WIDTH = 1240
+SCREEN_HEIGHT = 640
+FIELD_WIDTH = 80
 
 
 def init_all_valid_moves():
@@ -23,21 +22,32 @@ def init_all_valid_moves():
             for er in range(ROW_NR) for ec in range(COL_NR)}
 
 
+def get_init_board():
+    init_board = [
+        [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False), Rook(False)],
+        [Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False)],
+        [None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None],
+        [Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True)],
+        [Rook(True), Knight(True), Bishop(True), Queen(True), King(True), Bishop(True), Knight(True), Rook(True)],
+    ]
+    return init_board
+
+
 class ChessEngine:
-    def __init__(self, screen_width, screen_height, row_size):
-        self.board = [
-            [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False),
-             Rook(False)],
-            [Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False)],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True)],
-            [Rook(True), Knight(True), Bishop(True), Queen(True), King(True), Bishop(True), Knight(True), Rook(True)],
-        ]
+    def __init__(self, screen_width=SCREEN_WIDTH, screen_height=SCREEN_HEIGHT, field_width=FIELD_WIDTH):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.field_width = field_width
+        self.game_mode = "H"
+        self.reset()
+
+    def reset(self):
+        self.board = get_init_board()
+        self.screen = Screen(self.board, self.screen_width, self.screen_height, self.field_width)
         self.white_to_move = True
-        self.screen = Screen(screen_width, screen_height, row_size, self.board)
         self.clicked_squares = []
         self.active_square = ()
         self.game_log = []
@@ -48,12 +58,16 @@ class ChessEngine:
         self.is_game_started = False
         self.time_white = 10 * 60 * 1000
         self.time_black = 10 * 60 * 1000
-        self.game_mode = "H"
         self.network = Network()
         self.game_notation = []
         self.is_game_over = False
         self.winner = None
         self.is_check = False
+        self.color = None
+        self.is_player_white = None
+        self.last_move_white = ""
+        self.last_move_black = ""
+        self.is_game_analysed = False
 
     def calculate_board_val(self):
         board_val = 0
@@ -67,19 +81,24 @@ class ChessEngine:
 
     def __check_if_game_is_over(self):
         if len(set(self.all_valid_moves.values())) == 1:
-            self.white_to_move = not self.white_to_move
-            all_moves_at_the_end = self.calculate_all_possible_moves()
-            for end_move in all_moves_at_the_end:
-                if isinstance(end_move.capturedPiece, King):
-                    self.is_game_over = True
-                    self.winner = 1 if self.white_to_move else -1
-                    self.game_notation.append(self.game_notation.pop() + "+")
-                    winner = "White" if self.white_to_move else "Black"
-                    print(f'Game is ended. {winner} has won!')
-                    return
-            self.is_game_over = True
-            self.winner = 0
-            print("Game ended with a tie!")
+            self.game_over()
+
+    def game_over(self):
+        self.white_to_move = not self.white_to_move
+        all_moves_at_the_end = self.calculate_all_possible_moves()
+        for end_move in all_moves_at_the_end:
+            if isinstance(end_move.capturedPiece, King):
+                self.is_game_over = True
+                self.is_game_started = False
+                self.winner = 1 if self.white_to_move else -1
+                self.game_notation.append(self.game_notation.pop() + "+")
+                winner = "White" if self.white_to_move else "Black"
+                print(f'Game is ended. {winner} has won!')
+                return
+        self.is_game_over = True
+        self.is_game_started = False
+        self.winner = 0
+        print("Game ended with a tie!")
 
     def __reset_valid_moves(self):
         self.all_valid_moves = {k: None for k, v in self.all_valid_moves.items()}
@@ -153,7 +172,7 @@ class ChessEngine:
             if isinstance(last_but_one_moved_piece, Pawn):
                 last_but_one_moved_piece.en_passant = False
 
-    def make_move(self, move, validated_move=False, read=False):
+    def make_move(self, move, validated_move=False, read=False, enemy=False):
         self.board[move.startRow][move.startCol] = None
         self.board[move.endRow][move.endCol] = move.movedPiece
         if isinstance(move, EnPassantMove):
@@ -195,16 +214,21 @@ class ChessEngine:
             move.movedPiece.is_moved = True
             self.check_if_check()
             self.game_log.append(move)
-            self.game_notation.append(self.make_move_notation(move))
+            move_notation = self.make_move_notation(move)
+            self.game_notation.append(move_notation)
+            if not enemy:
+                if self.is_player_white:
+                    self.last_move_white = move_notation
+                else:
+                    self.last_move_black = move_notation
+            else:
+                if self.is_player_white:
+                    self.last_move_black = move_notation
+                else:
+                    self.last_move_white = move_notation
             self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
-            try:
-                if self.game_mode == "S":
-                    data = self.game_notation[-1]
-                    print(data)
-                    reply = self.network.send(data)
-            except:
-                None
+            self.__check_if_game_is_over()
         else:
             self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
@@ -268,7 +292,8 @@ class ChessEngine:
                 if len(moves_from_same_row) == 1:
                     move_notation = move_notation[:1] + move.rowsToRanks[move.startRow] + move_notation[1:]
                 else:
-                    move_notation = move_notation[:1] + move.get_file_rank(move.startRow, move.startCol) + move_notation[1:]
+                    move_notation = move_notation[:1] + move.get_file_rank(move.startRow,
+                                                                           move.startCol) + move_notation[1:]
         if move.capturedPiece is not None:
             move_notation = move_notation[:-2] + "x" + move_notation[-2:]
         if move_notation[0] == Pawn().name:
@@ -357,11 +382,13 @@ class ChessEngine:
         else:
             raise ValueError("More than one valid move were parsed from notation!")
 
-    def play_saved_game(self, game_notation):
-        move_notation = game_notation[len(self.game_notation)]
-        move = self.get_move_from_notation(move_notation)
-        self.make_move(move, validated_move=True, read=True)
-        self.__check_if_game_is_over()
+    def play_saved_game(self, saved_game_notation):
+        saved_game_len = len(saved_game_notation)
+        current_game_len = len(self.game_notation)
+        if current_game_len < saved_game_len:
+            move_notation = saved_game_notation[current_game_len]
+            move = self.get_move_from_notation(move_notation)
+            self.make_move(move, validated_move=True, read=True)
         return self.is_game_over
 
     def save_game_to_csv(self, path):
@@ -397,88 +424,93 @@ class ChessEngine:
         self.screen.controls.handle_button_click(location, self)
 
         if self.is_game_started:
-            row_nr = len(self.board)
-            col_nr = len(self.board[0])
-            col, row = self.screen.get_square_position(location)
+            if self.game_mode != "S" or self.is_player_white == self.white_to_move:
+                col, row = self.screen.get_square_position(location)
 
-            if col >= col_nr or row >= row_nr or self.active_square == (row, col):
-                self.reset_clicks()
-            elif len(self.clicked_squares) == 0:
-                piece = self.board[row][col]
-                if piece is not None and piece.color == self.__get_active_color():
+                if col >= COL_NR or row >= ROW_NR or self.active_square == (row, col):
+                    self.reset_clicks()
+                elif len(self.clicked_squares) == 0:
+                    piece = self.board[row][col]
+                    if piece is not None and piece.color == self.__get_active_color():
+                        self.active_square = (row, col)
+                        self.clicked_squares.append(self.active_square)
+                        # show possible moves
+                        self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
+                                                         self.active_square == (pos[0], pos[1]) and move is not None]
+                else:
                     self.active_square = (row, col)
                     self.clicked_squares.append(self.active_square)
+
                     # show possible moves
                     self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
                                                      self.active_square == (pos[0], pos[1]) and move is not None]
-            else:
-                self.active_square = (row, col)
-                self.clicked_squares.append(self.active_square)
-
-                # show possible moves
-                self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
-                                                 self.active_square == (pos[0], pos[1]) and move is not None]
 
         if len(self.clicked_squares) == 2:
             move = self.all_valid_moves[(*self.clicked_squares[0], *self.clicked_squares[1])]
             self.reset_clicks()
             if move is not None:
                 self.make_move(move, validated_move=True)
-                self.__check_if_game_is_over()
         return self.is_game_over
 
-    def make_engine_move(self):
-        # move = random.choice(tuple(filter(lambda move: move is not None, self.all_valid_moves.values())))
-        move = self.calculate_engine_move(max_lvl=2)
-        self.make_move(move, validated_move=True)
+    def play_computer_move(self, computer_engine):
+        move = self.calculate_engine_move(computer_engine)
+        self.make_move(move, validated_move=True, read=True)
+        return self.is_game_over
 
-    def calculate_engine_move(self, max_lvl, lvl=0):
-        if lvl >= max_lvl:
-            return self.board_val
-        valid_moves = tuple(filter(lambda move: move is not None, self.all_valid_moves.values()))
-        best_move = None
-        best_val = None
-        if self.white_to_move:
-            max_ = float('-inf')
-            for move in valid_moves:
-                self.make_move(move, validated_move=True)
-                if self.calculate_engine_move(max_lvl, lvl+1) > max_:
-                    best_move = move
-                    max_ = self.calculate_engine_move(max_lvl, lvl+1)
-                self.undo_move(validated_move=True)
-            best_val = max_
-        else:
-            min_ = float('inf')
-            for move in valid_moves:
-                self.make_move(move, validated_move=True)
-                move_val = self.calculate_engine_move(max_lvl, lvl+1)
-                if move_val < min_:
-                    best_move = move
-                    min_ = move_val
-                self.undo_move(validated_move=True)
-            best_val = min_
-        if lvl == 0:
-            return best_move
-        else:
-            return best_val
+    def calculate_engine_move(self, computer_engine):
+        uci_board = self.convert_board_to_uci_notation()
+        computer_engine_board = chess.Board(uci_board)
+        uci_move = computer_engine.play(computer_engine_board, chess.engine.Limit(time=0.8))
+        move = self.get_move_from_uci_notation(str(uci_move.move))
+        return move
+
+
+    # def calculate_engine_move(self, max_lvl, lvl=0):
+    #     if lvl >= max_lvl:
+    #         return self.board_val
+    #     valid_moves = tuple(filter(lambda move: move is not None, self.all_valid_moves.values()))
+    #     best_move = None
+    #     best_val = None
+    #     if self.white_to_move:
+    #         max_ = float('-inf')
+    #         for move in valid_moves:
+    #             self.make_move(move, validated_move=True)
+    #             if self.calculate_engine_move(max_lvl, lvl+1) > max_:
+    #                 best_move = move
+    #                 max_ = self.calculate_engine_move(max_lvl, lvl+1)
+    #             self.undo_move(validated_move=True)
+    #         best_val = max_
+    #     else:
+    #         min_ = float('inf')
+    #         for move in valid_moves:
+    #             self.make_move(move, validated_move=True)
+    #             move_val = self.calculate_engine_move(max_lvl, lvl+1)
+    #             if move_val < min_:
+    #                 best_move = move
+    #                 min_ = move_val
+    #             self.undo_move(validated_move=True)
+    #         best_val = min_
+    #     if lvl == 0:
+    #         return best_move
+    #     else:
+    #         return best_val
 
     def draw_chessboard(self):
         self.screen.draw_board(self.active_square, self.active_piece_valid_moves, self)
 
     def start_game(self):
+        self.reset()
         if self.game_mode == "H":
             self.is_game_started = True
         elif self.game_mode == "K":
             None
         elif self.game_mode == "S":
             self.network.connect()
-            self.is_game_started = True
 
     def end_game(self):
         self.is_game_started = False
 
     def convert_board_to_uci_notation(self):
-        # uci_notation_list = [["." for _ in range(COL_NR)] for _ in range(ROW_NR)]
         uci_notation_list = []
         for r in range(ROW_NR):
             uci_notation_list.append([])
@@ -499,3 +531,37 @@ class ChessEngine:
         footer = "KQkq - 0 " + str(int(len(self.game_notation) / 2 + 1))
         uci_notation = uci_notation + " " + to_move + " " + footer
         return uci_notation
+
+    def get_move_from_uci_notation(self, uci_notation):
+        start_col = Move.filesToCols.get(uci_notation[0])
+        start_row = Move.ranksToRows.get(uci_notation[1])
+        end_col = Move.filesToCols.get(uci_notation[2])
+        end_row = Move.ranksToRows.get(uci_notation[3])
+        move = self.all_valid_moves.get((start_row, start_col, end_row, end_col))
+        return move
+
+    def receive_from_server(self):
+        data = "WAITING"
+        if self.is_game_started:
+            data = "W:" + self.last_move_white if self.is_player_white else "B:" + self.last_move_black
+        if self.is_game_over:
+            data = "END"
+        reply = self.network.send(data)
+        if reply == "WAITING":
+            None
+        elif reply == "END":
+            self.network.disconnect()
+            self.game_over()
+        elif reply == "START":
+            self.is_game_started = True
+            self.is_player_white = self.network.id == "0"
+        else:
+            self.check_is_enemy_moved(reply)
+
+    def check_is_enemy_moved(self, reply):
+        move_white, move_black = reply.split(":")
+        last_enemy_move = move_black if self.is_player_white else move_white
+        if last_enemy_move != self.last_move_white and last_enemy_move != self.last_move_black:
+            move = self.get_move_from_notation(last_enemy_move)
+            self.make_move(move, validated_move=True, read=True, enemy=True)
+
