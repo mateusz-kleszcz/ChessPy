@@ -1,7 +1,8 @@
 import pygame as p
 import sys
 from Classes.ChessEngine import ChessEngine
-
+import chess
+import chess.engine
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -13,7 +14,7 @@ def main():
     engine = ChessEngine(SCREEN_WIDTH, SCREEN_HEIGHT, FIELD_WIDTH)
     clock = p.time.Clock()
     game_ended = False
-    game_notation = engine.read_game_from_csv("./Games/#1")
+    # game_notation = engine.read_game_from_csv("./Games/#1")
     while not game_ended:
         clock.tick(FPS)
         # handle events
@@ -39,7 +40,7 @@ def main():
         # draw chessboard
         engine.draw_chessboard()
 
-    engine.save_game_to_csv("./Games/#1")
+    # engine.save_game_to_csv("./Games/#1")
 
 
 # import asyncio
@@ -57,7 +58,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    engine = ChessEngine(SCREEN_WIDTH, SCREEN_HEIGHT, FIELD_WIDTH)
+    computer_engine = chess.engine.SimpleEngine.popen_uci(r".\engine\stockfish_15_x64_avx2.exe")
+    uci_notation = engine.convert_board_to_uci_notation()
+    chess.Board(uci_notation)
+    # main()
 
     # asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
     # asyncio.run(test())

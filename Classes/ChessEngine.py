@@ -7,10 +7,10 @@ import pygame as p
 # from Classes.Pieces.Queen import Queen
 # from Classes.Pieces.King import King
 
-from Pieces import *
-from Moves import *
+from Classes.Pieces import *
+from Classes.Moves import *
 from GUI import *
-from Screen import Screen
+from GUI.Screen import Screen
 from network import Network
 import csv
 
@@ -476,3 +476,26 @@ class ChessEngine:
 
     def end_game(self):
         self.is_game_started = False
+
+    def convert_board_to_uci_notation(self):
+        # uci_notation_list = [["." for _ in range(COL_NR)] for _ in range(ROW_NR)]
+        uci_notation_list = []
+        for r in range(ROW_NR):
+            uci_notation_list.append([])
+            for c in range(COL_NR):
+                piece = self.board[r][c]
+                if piece is not None:
+                    uci_notation_list[-1].append(piece.name if piece.color == "W" else piece.name.lower())
+                elif c == 0 or not uci_notation_list[-1][-1].isnumeric():
+                    uci_notation_list[-1].append("1")
+                else:
+                    pawn_in_row_ctr = int(uci_notation_list[-1].pop()) + 1
+                    uci_notation_list[-1].append(str(pawn_in_row_ctr))
+        uci_notation = '/'.join([''.join(field) for field in uci_notation_list])
+        if self.white_to_move:
+            to_move = "w"
+        else:
+            to_move = "b"
+        footer = "KQkq - 0 " + str(int(len(self.game_notation) / 2 + 1))
+        uci_notation = uci_notation + " " + to_move + " " + footer
+        return uci_notation
