@@ -376,11 +376,14 @@ class ChessEngine:
         else:
             raise ValueError("More than one valid move were parsed from notation!")
 
-    def play_saved_game(self, game_notation):
-        move_notation = game_notation[len(self.game_notation)]
-        move = self.get_move_from_notation(move_notation)
-        self.make_move(move, validated_move=True, read=True)
-        self.__check_if_game_is_over()
+    def play_saved_game(self, saved_game_notation):
+        saved_game_len = len(saved_game_notation)
+        current_game_len = len(self.game_notation)
+        if current_game_len < saved_game_len:
+            move_notation = saved_game_notation[current_game_len]
+            move = self.get_move_from_notation(move_notation)
+            self.make_move(move, validated_move=True, read=True)
+            self.__check_if_game_is_over()
         return self.is_game_over
 
     def save_game_to_csv(self, path):
