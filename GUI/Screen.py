@@ -12,7 +12,7 @@ def change_move(move):
 
 
 class Screen:
-    def __init__(self, width, height, field_size, board):
+    def __init__(self, board, width=1240, height=640, field_size=80):
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height))

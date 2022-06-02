@@ -1,5 +1,5 @@
 import pygame as p
-
+from copy import deepcopy
 
 from Pieces import *
 from Moves import *
@@ -10,29 +10,41 @@ import csv
 ROW_NR = 8
 COL_NR = 8
 
+SCREEN_WIDTH = 1240
+SCREEN_HEIGHT = 640
+FIELD_WIDTH = 80
+
 
 def init_all_valid_moves():
     return {(sr, sc, er, ec): None for sr in range(ROW_NR) for sc in range(COL_NR)
             for er in range(ROW_NR) for ec in range(COL_NR)}
 
 
-init_board = [
-    [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False), Rook(False)],
-    [Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False)],
-    [None, None, None, None, None, None, None, None],
-    [None, None, None, None, None, None, None, None],
-    [None, None, None, None, None, None, None, None],
-    [None, None, None, None, None, None, None, None],
-    [Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True)],
-    [Rook(True), Knight(True), Bishop(True), Queen(True), King(True), Bishop(True), Knight(True), Rook(True)],
-]
+def get_init_board():
+    init_board = [
+        [Rook(False), Knight(False), Bishop(False), Queen(False), King(False), Bishop(False), Knight(False), Rook(False)],
+        [Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False), Pawn(False)],
+        [None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None],
+        [None, None, None, None, None, None, None, None],
+        [Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True), Pawn(True)],
+        [Rook(True), Knight(True), Bishop(True), Queen(True), King(True), Bishop(True), Knight(True), Rook(True)],
+    ]
+    return init_board
 
 
 class ChessEngine:
-    def __init__(self, screen_width, screen_height, row_size):
-        self.board = init_board
+    def __init__(self, screen_width=SCREEN_WIDTH, screen_height=SCREEN_HEIGHT, field_width=FIELD_WIDTH):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.field_width = field_width
+        self.reset()
+
+    def reset(self):
+        self.board = get_init_board()
+        self.screen = Screen(self.board, self.screen_width, self.screen_height, self.field_width)
         self.white_to_move = True
-        self.screen = Screen(screen_width, screen_height, row_size, self.board)
         self.clicked_squares = []
         self.active_square = ()
         self.game_log = []
@@ -405,11 +417,9 @@ class ChessEngine:
 
         if self.is_game_started:
             if self.game_mode != "S" or self.is_player_white == self.white_to_move:
-                row_nr = len(self.board)
-                col_nr = len(self.board[0])
                 col, row = self.screen.get_square_position(location)
 
-                if col >= col_nr or row >= row_nr or self.active_square == (row, col):
+                if col >= COL_NR or row >= ROW_NR or self.active_square == (row, col):
                     self.reset_clicks()
                 elif len(self.clicked_squares) == 0:
                     piece = self.board[row][col]
@@ -474,6 +484,7 @@ class ChessEngine:
         self.screen.draw_board(self.active_square, self.active_piece_valid_moves, self)
 
     def start_game(self):
+        self.reset()
         if self.game_mode == "H":
             self.is_game_started = True
         elif self.game_mode == "K":

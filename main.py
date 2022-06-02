@@ -2,15 +2,11 @@ import pygame as p
 import sys
 from Classes.ChessEngine import ChessEngine
 
-
-SCREEN_WIDTH = 1240
-SCREEN_HEIGHT = 640
-FIELD_WIDTH = 80
 FPS = 50
 
 
 def main():
-    engine = ChessEngine(SCREEN_WIDTH, SCREEN_HEIGHT, FIELD_WIDTH)
+    engine = ChessEngine()
     clock = p.time.Clock()
     game_notation = engine.read_game_from_csv("./Games/#1")
     while True:
