@@ -1,0 +1,4 @@
+chess==1.9.1
+networkx==2.7.1
+numpy==1.22.3
+pygame==2.1.2
