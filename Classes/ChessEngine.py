@@ -10,6 +10,7 @@ import csv
 ROW_NR = 8
 COL_NR = 8
 
+
 def init_all_valid_moves():
     return {(sr, sc, er, ec): None for sr in range(ROW_NR) for sc in range(COL_NR)
             for er in range(ROW_NR) for ec in range(COL_NR)}
@@ -46,6 +47,10 @@ class ChessEngine:
         self.is_game_over = False
         self.winner = None
         self.is_check = False
+        self.color = None
+        self.is_player_white = None
+        self.last_move_white = ""
+        self.last_move_black = ""
 
     def calculate_board_val(self):
         board_val = 0
@@ -191,13 +196,7 @@ class ChessEngine:
             self.game_notation.append(self.make_move_notation(move))
             self.__update_en_passant_pawn()
             self.all_valid_moves = self.calculate_all_valid_moves()
-            try:
-                if self.game_mode == "S":
-                    data = self.game_notation[-1]
-                    print(data)
-                    reply = self.network.send(data)
-            except:
-                None
+            print(self.make_move_notation(move))
         else:
             self.__update_en_passant_pawn()
             self.possible_move_log.append(move)
@@ -242,6 +241,7 @@ class ChessEngine:
             else:
                 raise ValueError('Invalid castle move!')
 
+        pawn_promotion = move.promotedPieceType().name if isinstance(move, PawnPromotion) else ""
         move_notation = move.get_notation()
         from operator import itemgetter
         moves_to_end_sq = itemgetter(
@@ -260,12 +260,13 @@ class ChessEngine:
                 if len(moves_from_same_row) == 1:
                     move_notation = move_notation[:1] + move.rowsToRanks[move.startRow] + move_notation[1:]
                 else:
-                    move_notation = move_notation[:1] + move.get_file_rank(move.startRow, move.startCol) + move_notation[1:]
+                    move_notation = move_notation[:1] + move.get_file_rank(move.startRow,
+                                                                           move.startCol) + move_notation[1:]
         if move.capturedPiece is not None:
             move_notation = move_notation[:-2] + "x" + move_notation[-2:]
         if move_notation[0] == Pawn().name:
             move_notation = move_notation[1:]
-        return move_notation + check
+        return move_notation + pawn_promotion + check
 
     def check_if_check(self):
         self.white_to_move = not self.white_to_move
@@ -376,33 +377,38 @@ class ChessEngine:
         self.screen.controls.handle_button_click(location, self)
 
         if self.is_game_started:
-            row_nr = len(self.board)
-            col_nr = len(self.board[0])
-            col, row = self.screen.get_square_position(location)
+            if self.game_mode != "S" or self.is_player_white == self.white_to_move:
+                row_nr = len(self.board)
+                col_nr = len(self.board[0])
+                col, row = self.screen.get_square_position(location)
 
-            if col >= col_nr or row >= row_nr or self.active_square == (row, col):
-                self.reset_clicks()
-            elif len(self.clicked_squares) == 0:
-                piece = self.board[row][col]
-                if piece is not None and piece.color == self.__get_active_color():
+                if col >= col_nr or row >= row_nr or self.active_square == (row, col):
+                    self.reset_clicks()
+                elif len(self.clicked_squares) == 0:
+                    piece = self.board[row][col]
+                    if piece is not None and piece.color == self.__get_active_color():
+                        self.active_square = (row, col)
+                        self.clicked_squares.append(self.active_square)
+                        # show possible moves
+                        self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
+                                                         self.active_square == (pos[0], pos[1]) and move is not None]
+                else:
                     self.active_square = (row, col)
                     self.clicked_squares.append(self.active_square)
+
                     # show possible moves
                     self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
                                                      self.active_square == (pos[0], pos[1]) and move is not None]
-            else:
-                self.active_square = (row, col)
-                self.clicked_squares.append(self.active_square)
-
-                # show possible moves
-                self.active_piece_valid_moves = [move for pos, move in self.all_valid_moves.items() if
-                                                 self.active_square == (pos[0], pos[1]) and move is not None]
 
         if len(self.clicked_squares) == 2:
             move = self.all_valid_moves[(*self.clicked_squares[0], *self.clicked_squares[1])]
             self.reset_clicks()
             if move is not None:
                 self.make_move(move, validated_move=True)
+                if self.is_player_white:
+                    self.last_move_white = self.make_move_notation(move)
+                else:
+                    self.last_move_black = self.make_move_notation(move)
                 self.__check_if_game_is_over()
         return self.is_game_over
 
@@ -451,7 +457,27 @@ class ChessEngine:
             None
         elif self.game_mode == "S":
             self.network.connect()
-            self.is_game_started = True
 
     def end_game(self):
         self.is_game_started = False
+
+    def receive_from_server(self):
+        data = "WAITING"
+        if self.is_game_started:
+            data = "W:" + self.last_move_white if self.is_player_white else "B:" + self.last_move_black
+        reply = self.network.send(data)
+        if reply == "WAITING":
+            None
+        elif reply == "START":
+            self.is_game_started = True
+            self.is_player_white = self.network.id == "0"
+        else:
+            self.check_is_enemy_moved(reply)
+
+    def check_is_enemy_moved(self, reply):
+        move_white, move_black = reply.split(":")
+        last_enemy_move = move_black if self.is_player_white else move_white
+        last_player_move = self.last_move_white if self.white_to_move else self.last_move_black
+        if last_enemy_move != last_player_move:
+            print(last_enemy_move)
+            # self.get_move_from_notation(last_enemy_move)

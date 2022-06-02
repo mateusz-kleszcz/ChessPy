@@ -10,11 +10,14 @@ class Network:
                                     # ipv4 address. This feild will be the same for all your clients.
         self.port = 8080
         self.address = (self.host, self.port)
-        self.id = -1
+        self.id = "-1"
 
     def connect(self):
-        self.client.connect(self.address)
-        self.id = self.client.recv(2048).decode()
+        try:
+            self.client.connect(self.address)
+            self.id = self.client.recv(2048).decode()
+        except socket.error as e:
+            return str(e)
 
     def send(self, data):
         try:

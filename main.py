@@ -17,6 +17,9 @@ def main():
     while not game_ended:
         clock.tick(FPS)
         # handle events
+        if engine.game_mode == "S" and engine.network.id != "-1":
+            engine.receive_from_server()
+
         if engine.is_game_started:
             if engine.white_to_move:
                 engine.time_white = engine.time_white - 20
