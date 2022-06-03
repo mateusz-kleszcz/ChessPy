@@ -3,6 +3,7 @@ import chess
 import chess.engine
 import csv
 from network import Network
+from collections import Counter
 
 from Classes.Pieces import *
 from Classes.Moves import *
@@ -60,6 +61,7 @@ class ChessEngine:
         self.time_black = 10 * 60 * 1000
         self.network = Network()
         self.game_notation = []
+        self.board_states = [self.get_board_state()]
         self.is_game_over = False
         self.winner = None
         self.is_check = False
@@ -82,23 +84,33 @@ class ChessEngine:
     def __check_if_game_is_over(self):
         if len(set(self.all_valid_moves.values())) == 1:
             self.game_over()
+        if Counter(self.board_states).get(self.board_states[-1]) >= 3:
+            self.__tie()
+
+    def __tie(self):
+        self.is_game_over = True
+        self.is_game_started = False
+        self.winner = 0
+        print("Game ended with a tie!")
+
+    def __win(self):
+        self.is_game_over = True
+        self.is_game_started = False
+        self.winner = 1 if self.white_to_move else -1
+        self.game_notation.append(self.game_notation.pop() + "+")
+        winner = "White" if self.white_to_move else "Black"
+        print(f'Game is ended. {winner} has won!')
 
     def game_over(self):
         self.white_to_move = not self.white_to_move
         all_moves_at_the_end = self.calculate_all_possible_moves()
         for end_move in all_moves_at_the_end:
             if isinstance(end_move.capturedPiece, King):
-                self.is_game_over = True
-                self.is_game_started = False
-                self.winner = 1 if self.white_to_move else -1
-                self.game_notation.append(self.game_notation.pop() + "+")
-                winner = "White" if self.white_to_move else "Black"
-                print(f'Game is ended. {winner} has won!')
+                self.__win()
+                self.white_to_move = not self.white_to_move
                 return
-        self.is_game_over = True
-        self.is_game_started = False
-        self.winner = 0
-        print("Game ended with a tie!")
+        self.__tie()
+        self.white_to_move = not self.white_to_move
 
     def __reset_valid_moves(self):
         self.all_valid_moves = {k: None for k, v in self.all_valid_moves.items()}
@@ -216,6 +228,7 @@ class ChessEngine:
             self.game_log.append(move)
             move_notation = self.make_move_notation(move)
             self.game_notation.append(move_notation)
+            self.board_states.append(self.get_board_state())
             if not enemy:
                 if self.is_player_white:
                     self.last_move_white = move_notation
@@ -240,6 +253,8 @@ class ChessEngine:
                 return
             move = self.game_log.pop()
             self.game_notation.pop()
+            if len(self.board_states) > 1:
+                self.board_states.pop()
         else:
             move = self.possible_move_log.pop()
         self.board[move.startRow][move.startCol] = move.movedPiece
@@ -510,7 +525,7 @@ class ChessEngine:
     def end_game(self):
         self.is_game_started = False
 
-    def convert_board_to_uci_notation(self):
+    def get_board_state(self):
         uci_notation_list = []
         for r in range(ROW_NR):
             uci_notation_list.append([])
@@ -524,6 +539,10 @@ class ChessEngine:
                     pawn_in_row_ctr = int(uci_notation_list[-1].pop()) + 1
                     uci_notation_list[-1].append(str(pawn_in_row_ctr))
         uci_notation = '/'.join([''.join(field) for field in uci_notation_list])
+        return uci_notation
+
+    def convert_board_to_uci_notation(self):
+        uci_notation = self.get_board_state()
         if self.white_to_move:
             to_move = "w"
         else:

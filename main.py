@@ -26,13 +26,14 @@ def main():
         for event in p.event.get():
             if event.type == p.QUIT:
                 sys.exit(0)
-            elif event.type == p.MOUSEBUTTONDOWN \
-                    and engine.white_to_move: ###
+            # elif event.type == p.MOUSEBUTTONDOWN \
+            #         and engine.white_to_move: ###
+            elif event.type == p.MOUSEBUTTONDOWN:
                 # make move
                 location = p.mouse.get_pos()
                 engine.handle_click(location)
-            elif not engine.white_to_move:
-                engine.play_computer_move(computer_engine)
+            # elif not engine.white_to_move:
+            #     engine.play_computer_move(computer_engine)
             elif event.type == p.KEYDOWN and event.key == p.K_BACKSPACE:
                 # undo move
                 engine.undo_move(validated_move=True)
