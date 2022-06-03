@@ -12,8 +12,6 @@ def main():
     engine = ChessEngine()
     clock = p.time.Clock()
     game_notation = engine.read_game_from_csv("./games/#1")
-    computer_game = True
-    computer_engine = chess.engine.SimpleEngine.popen_uci(r".\chess_engines\stockfish_15_x64_avx2.exe")
     while True:
         clock.tick(FPS)
         # handle events
@@ -28,14 +26,14 @@ def main():
         for event in p.event.get():
             if event.type == p.QUIT:
                 sys.exit(0)
-            # elif event.type == p.MOUSEBUTTONDOWN \
-            #         and chess_engines.white_to_move: ###
+
             elif event.type == p.MOUSEBUTTONDOWN:
                 # make move
                 location = p.mouse.get_pos()
-                engine.handle_click(location)
-            # elif not chess_engines.white_to_move:
-            #     chess_engines.play_computer_move(computer_engine)
+                if engine.game_mode == "H" or engine.game_mode == "K" and engine.white_to_move:
+                    engine.handle_click(location)
+            elif engine.game_mode == "K" and not engine.white_to_move:
+                engine.play_computer_move()
             elif event.type == p.KEYDOWN and event.key == p.K_BACKSPACE:
                 # undo move
                 engine.undo_move(validated_move=True)

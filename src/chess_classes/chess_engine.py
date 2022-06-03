@@ -43,6 +43,7 @@ class ChessEngine:
         self.field_width = field_width
         self.game_mode = "H"
         self.reset()
+        self.computer_engine = chess.engine.SimpleEngine.popen_uci(r".\chess_engines\stockfish_15_x64_avx2.exe")
 
     def reset(self):
         self.board = get_init_board()
@@ -466,15 +467,15 @@ class ChessEngine:
                 self.make_move(move, validated_move=True)
         return self.is_game_over
 
-    def play_computer_move(self, computer_engine):
-        move = self.calculate_engine_move(computer_engine)
+    def play_computer_move(self):
+        move = self.calculate_engine_move()
         self.make_move(move, validated_move=True, read=True)
         return self.is_game_over
 
-    def calculate_engine_move(self, computer_engine):
+    def calculate_engine_move(self):
         uci_board = self.convert_board_to_uci_notation()
         computer_engine_board = chess.Board(uci_board)
-        uci_move = computer_engine.play(computer_engine_board, chess.engine.Limit(time=0.8))
+        uci_move = self.computer_engine.play(computer_engine_board, chess.engine.Limit(time=0.8))
         move = self.get_move_from_uci_notation(str(uci_move.move))
         return move
 
@@ -512,12 +513,14 @@ class ChessEngine:
     def draw_chessboard(self):
         self.screen.draw_board(self.active_square, self.active_piece_valid_moves, self)
 
+    # def play_vs_computer(self):
+    #     self.play_computer_move()
+
     def start_game(self):
+        print(self.game_mode)
         self.reset()
-        if self.game_mode == "H":
+        if self.game_mode == "H" or self.game_mode == "K":
             self.is_game_started = True
-        elif self.game_mode == "K":
-            None
         elif self.game_mode == "S":
             self.network.connect()
 
