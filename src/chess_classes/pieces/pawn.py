@@ -1,7 +1,7 @@
-from Classes.Moves.EnPassantMove import EnPassantMove
-from Classes.Moves.PawnPromotion import PawnPromotion
-from Classes.Pieces.Piece import Piece
-from Classes.Moves.Move import Move
+from src.chess_classes.moves.en_passant import EnPassant
+from src.chess_classes.moves.pawn_promotion import PawnPromotion
+from src.chess_classes.pieces.piece import Piece
+from src.chess_classes.moves.move import Move
 
 
 class Pawn(Piece):
@@ -66,6 +66,6 @@ class Pawn(Piece):
                     start_sq = (row, col)
                     end_sq = (row + row_dir, col + col_dir)
                     captured_pawn_sq = (row, col + col_dir)
-                    possible_moves.append(EnPassantMove(chess_board, start_sq, end_sq, captured_pawn_sq))
+                    possible_moves.append(EnPassant(chess_board, start_sq, end_sq, captured_pawn_sq))
 
         return possible_moves

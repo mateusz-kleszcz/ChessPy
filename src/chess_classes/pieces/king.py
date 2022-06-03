@@ -1,9 +1,9 @@
-from Classes.Moves.Castle import Castle
-from Classes.Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
-from Classes.Pieces.Rook import Rook
+from src.chess_classes.moves.castle import Castle
+from src.chess_classes.pieces.piece_with_const_move_dir import PieceWithConstMoveDir
+from src.chess_classes.pieces.rook import Rook
 
 
-class King(PieceWithLimitedMoveDir):
+class King(PieceWithConstMoveDir):
     moves_dir = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (-1, 0)]
 
     def __init__(self, is_white=True):

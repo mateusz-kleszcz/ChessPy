@@ -1,8 +1,8 @@
-from GUI.ButtonGroup import ButtonGroup
-from GUI.Button import Button
 import easygui
 
-from Label import Label
+from src.gui.button_group import ButtonGroup
+from src.gui.button import Button
+from src.gui.label import Label
 
 
 def change_game_mode(engine, value):

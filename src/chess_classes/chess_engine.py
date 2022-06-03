@@ -2,13 +2,12 @@ import pygame as p
 import chess
 import chess.engine
 import csv
-from network import Network
 from collections import Counter
 
-from Classes.Pieces import *
-from Classes.Moves import *
-from GUI import *
-from GUI.Screen import Screen
+from src.chess_classes.pieces import *
+from src.chess_classes.moves import *
+from src.gui.screen import Screen
+from src.server.network import Network
 
 ROW_NR = 8
 COL_NR = 8
@@ -187,7 +186,7 @@ class ChessEngine:
     def make_move(self, move, validated_move=False, read=False, enemy=False):
         self.board[move.startRow][move.startCol] = None
         self.board[move.endRow][move.endCol] = move.movedPiece
-        if isinstance(move, EnPassantMove):
+        if isinstance(move, EnPassant):
             self.board[move.captured_pawn_sq[0]][move.captured_pawn_sq[1]] = None
         elif isinstance(move, Castle):
             rook = self.board[move.startRow][move.rook_start_col]
@@ -260,7 +259,7 @@ class ChessEngine:
         self.board[move.startRow][move.startCol] = move.movedPiece
         self.board[move.endRow][move.endCol] = move.capturedPiece
         move.movedPiece.is_moved = not move.piece_first_move
-        if isinstance(move, EnPassantMove):
+        if isinstance(move, EnPassant):
             self.board[move.captured_pawn_sq[0]][move.captured_pawn_sq[1]] = move.capture_pawn
         elif isinstance(move, Castle):
             rook = self.board[move.startRow][move.rook_end_col]

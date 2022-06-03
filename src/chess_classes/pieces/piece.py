@@ -23,7 +23,7 @@ class Piece:
         return []
 
     def load_image(self):
-        return p.image.load(os.path.join(".", "assets", f'{self.color}{self.name}.png'))
+        return p.image.load(os.path.join("", "assets", f'{self.color}{self.name}.png'))
 
     def __eq__(self, other):
         if type(self) is type(other):

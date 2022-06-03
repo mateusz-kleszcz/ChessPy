@@ -1,9 +1,9 @@
 import pygame
 
-from GUI.Board import Board
-from GUI.Controls import Controls
-from GUI.Timer import Timer
-from Label import Label
+from src.gui.board import Board
+from src.gui.controls import Controls
+from src.gui.timer import Timer
+from src.gui.label import Label
 
 
 class Screen:

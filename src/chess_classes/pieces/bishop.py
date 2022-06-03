@@ -1,5 +1,5 @@
-from Classes.Pieces.Piece import Piece
-from Classes.Moves.Move import Move
+from src.chess_classes.pieces.piece import Piece
+from src.chess_classes.moves.move import Move
 
 
 class Bishop(Piece):

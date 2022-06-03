@@ -1,8 +1,8 @@
-from Classes.Pieces.Piece import Piece
-from Classes.Moves.Move import Move
+from src.chess_classes.pieces.piece import Piece
+from src.chess_classes.moves.move import Move
 
 
-class PieceWithLimitedMoveDir(Piece):
+class PieceWithConstMoveDir(Piece):
     moves_dir = []
 
     def __init__(self, is_white, name, is_moved=False, val=0, pos_vals=None):

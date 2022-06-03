@@ -1,7 +1,7 @@
-from Classes.Moves.Move import Move
+from src.chess_classes.moves.move import Move
 
 
-class EnPassantMove(Move):
+class EnPassant(Move):
     def __init__(self, board, startSq, endSq, captured_pawn_sq):
         super().__init__(board, startSq, endSq)
         self.captured_pawn_sq = captured_pawn_sq

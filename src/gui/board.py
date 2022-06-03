@@ -1,5 +1,6 @@
 import pygame
-from GUI.Field import Field
+
+from src.gui.field import Field
 
 BOARD_SIZE = 8
 ACTIVE_BACKGROUND = (117, 199, 232)

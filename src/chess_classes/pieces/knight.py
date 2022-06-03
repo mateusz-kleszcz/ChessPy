@@ -1,7 +1,7 @@
-from Classes.Pieces.PieceWithLimitedMoveDir import PieceWithLimitedMoveDir
+from src.chess_classes.pieces.piece_with_const_move_dir import PieceWithConstMoveDir
 
 
-class Knight(PieceWithLimitedMoveDir):
+class Knight(PieceWithConstMoveDir):
     moves_dir = [(1, -2), (2, -1), (2, 1), (1, 2), (-1, 2), (-2, 1), (-2, -1), (-1, -2)]
 
     def __init__(self, is_white=True, is_moved=False):

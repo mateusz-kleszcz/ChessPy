@@ -1,17 +1,19 @@
 import pygame as p
 import sys
-from Classes.ChessEngine import ChessEngine
 import chess
 import chess.engine
+
+from src.chess_classes.chess_engine import ChessEngine
+
 FPS = 50
 
 
 def main():
     engine = ChessEngine()
     clock = p.time.Clock()
-    game_notation = engine.read_game_from_csv("./Games/#1")
+    game_notation = engine.read_game_from_csv("./games/#1")
     computer_game = True
-    computer_engine = chess.engine.SimpleEngine.popen_uci(r".\engine\stockfish_15_x64_avx2.exe")
+    computer_engine = chess.engine.SimpleEngine.popen_uci(r".\chess_engines\stockfish_15_x64_avx2.exe")
     while True:
         clock.tick(FPS)
         # handle events
@@ -27,13 +29,13 @@ def main():
             if event.type == p.QUIT:
                 sys.exit(0)
             # elif event.type == p.MOUSEBUTTONDOWN \
-            #         and engine.white_to_move: ###
+            #         and chess_engines.white_to_move: ###
             elif event.type == p.MOUSEBUTTONDOWN:
                 # make move
                 location = p.mouse.get_pos()
                 engine.handle_click(location)
-            # elif not engine.white_to_move:
-            #     engine.play_computer_move(computer_engine)
+            # elif not chess_engines.white_to_move:
+            #     chess_engines.play_computer_move(computer_engine)
             elif event.type == p.KEYDOWN and event.key == p.K_BACKSPACE:
                 # undo move
                 engine.undo_move(validated_move=True)
@@ -41,37 +43,37 @@ def main():
         # draw chessboard
         engine.draw_chessboard()
 
-    # engine.save_game_to_csv("./Games/#1")
+    # chess_engines.save_game_to_csv("./games/#1")
 
 
 # import asyncio
 # import chess
-# import chess.engine
+# import chess.chess_engines
 # async def test() -> None:
-#     transport, engine = await chess.engine.popen_uci(r"./engine/Stockfish")
+#     transport, chess_engines = await chess.chess_engines.popen_uci(r"./chess_engines/Stockfish")
 #
 #     board = chess.Board()
 #     while not board.is_game_over():
-#         result = await engine.play(board, chess.engine.Limit(time=0.1))
+#         result = await chess_engines.play(board, chess.chess_engines.Limit(time=0.1))
 #         board.push(result.move)
 #
-#     await engine.quit()
+#     await chess_engines.quit()
 
 
 if __name__ == '__main__':
-    # engine = ChessEngine()
-    # computer_engine = chess.engine.SimpleEngine.popen_uci(r".\engine\stockfish_15_x64_avx2.exe")
-    # uci_notation = engine.convert_board_to_uci_notation()
+    # chess_engines = ChessEngine()
+    # computer_engine = chess.chess_engines.SimpleEngine.popen_uci(r".\chess_engines\stockfish_15_x64_avx2.exe")
+    # uci_notation = chess_engines.convert_board_to_uci_notation()
     # board = chess.Board(uci_notation)
-    # result = computer_engine.play(board, chess.engine.Limit(time=0.1))
+    # result = computer_engine.play(board, chess.chess_engines.Limit(time=0.1))
     # print(result)
     main()
 
-    # asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
+    # asyncio.set_event_loop_policy(chess.chess_engines.EventLoopPolicy())
     # asyncio.run(test())
-    # engine = chess.engine.SimpleEngine.popen_uci(r"./engine/Stockfish")
+    # chess_engines = chess.chess_engines.SimpleEngine.popen_uci(r"./chess_engines/Stockfish")
     # board = chess.Board()
-    # info = engine.analyse(board, chess.engine.Limit(time=0.1))
+    # info = chess_engines.analyse(board, chess.chess_engines.Limit(time=0.1))
     # print("Score:", info["score"])
 
 # r n b q k b n r

@@ -1,4 +1,4 @@
-from Classes.Moves.Move import Move
+from src.chess_classes.moves.move import Move
 
 
 class Castle(Move):
